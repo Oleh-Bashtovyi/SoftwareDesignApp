@@ -1,0 +1,26 @@
+﻿<base:BaseBlockControl x:Class="SoftwareDesignApp.UI.Blocks.EndBlockControl"
+                        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                        xmlns:local="clr-namespace:SoftwareDesignApp.UI.Blocks"
+                        xmlns:convertes="clr-namespace:SoftwareDesignApp.UI.Converters"
+                        xmlns:base="clr-namespace:SoftwareDesignApp.UI.Blocks.Base"
+                        Width="200" Height="50">
+    <base:BaseBlockControl.Resources>
+        <convertes:BoolToBlockColorConverter x:Key="BoolToColorConverter"/>
+    </base:BaseBlockControl.Resources>
+
+    <Canvas>
+        <Ellipse Width="200" Height="50"
+                 Fill="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, Mode=OneWay}" Stroke="Black"
+                 Tag="{Binding BlockId}" />
+
+        <TextBlock Text="{Binding DiagramText}"
+                   TextAlignment="Center"
+                   VerticalAlignment="Center"
+                   FontWeight="Bold"
+                   Width="200" Height="50"
+                   TextWrapping="Wrap"
+                   Padding="5"
+                   Tag="{Binding BlockId}"/>
+    </Canvas>
+</base:BaseBlockControl>
