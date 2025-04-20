@@ -4,7 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
-        Width="350" Height="150"
+        Width="350" Height="180"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
         Background="#2D2D2D">
