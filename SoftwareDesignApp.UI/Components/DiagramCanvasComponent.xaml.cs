@@ -66,6 +66,15 @@ public partial class DiagramCanvasComponent : UserControl
         deleteItem.Click += (s, e) => DeleteSelectedBlock();
         _contextMenu.Items.Add(deleteItem);
         ContextMenu = _contextMenu;
+
+        foreach (var block in ViewModel.GetBlocks())
+        {
+            block.MouseLeftButtonDown += OnBlockMouseLeftButtonDown;
+            block.MouseMove += OnBlockMouseMove;
+            block.MouseLeftButtonUp += OnBlockMouseLeftButtonUp;
+            block.MouseRightButtonDown += OnBlockMouseRightButtonDown;
+            MainCanvas.Children.Add(block);
+        }
     }
 
     private void AddBlock(object sender, MouseButtonEventArgs e)

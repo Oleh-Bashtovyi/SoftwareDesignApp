@@ -1,8 +1,12 @@
-﻿using SoftwareDesignApp.UI.Blocks;
+﻿using System.IO;
+using SoftwareDesignApp.UI.Blocks;
 using SoftwareDesignApp.UI.ViewModels;
 using System.Windows;
 using System.Windows.Controls;
+using Microsoft.Win32;
+using Newtonsoft.Json;
 using SoftwareDesignApp.UI.Components;
+using Formatting = System.Xml.Formatting;
 
 namespace SoftwareDesignApp.UI;
 
@@ -27,12 +31,75 @@ public partial class MainWindow : Window
 
     private void Save(object sender, RoutedEventArgs e)
     {
-        throw new NotImplementedException();
+        if (tabs.Items.Count == 0)
+            return;
+
+        var selectedTab = tabs.SelectedItem as TabItem;
+        if (selectedTab == null)
+            return;
+
+        var tabName = selectedTab.Header.ToString();
+        if (_tabEditors.TryGetValue(tabName, out var canvasComponent))
+        {
+            var diagram = canvasComponent.ViewModel;
+
+            var saveDialog = new SaveFileDialog
+            {
+                DefaultExt = ".json",
+                Filter = "JSON Files (*.json)|*.json",
+                FileName = $"{diagram.Name}.json"
+            };
+
+            if (saveDialog.ShowDialog() == true)
+            {
+                string json = JsonConvert.SerializeObject(diagram.ToDict(), Newtonsoft.Json.Formatting.Indented);
+                File.WriteAllText(saveDialog.FileName, json);
+                MessageBox.Show($"Діаграму збережено як {saveDialog.FileName}", "Збережено", MessageBoxButton.OK, MessageBoxImage.Information);
+            }
+        }
     }
 
     private void OpenFile(object sender, RoutedEventArgs e)
     {
-        throw new NotImplementedException();
+        OpenFileDialog openDialog = new OpenFileDialog
+        {
+            Filter = "JSON Files (*.json)|*.json"
+        };
+
+        if (openDialog.ShowDialog() == true)
+        {
+            try
+            {
+                string json = File.ReadAllText(openDialog.FileName);
+                var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
+                var diagram = Diagram.LoadFromDict(data, _sharedVariables);
+
+                string diagramName = diagram.Name;
+                string uniqueName = diagramName;
+                int counter = 1;
+
+                while (_tabEditors.ContainsKey(uniqueName))
+                {
+                    uniqueName = $"{diagramName}_{counter}";
+                    counter++;
+                }
+
+                TabItem newTab = new TabItem
+                {
+                    Header = uniqueName
+                };
+
+                var editor = new DiagramCanvasComponent(diagram);
+                newTab.Content = editor;
+                tabs.Items.Add(newTab);
+                tabs.SelectedItem = newTab;
+                _tabEditors[uniqueName] = editor;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Помилка при відкритті файлу: {ex.Message}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
     }
 
     private void RunCode(object sender, RoutedEventArgs e)
