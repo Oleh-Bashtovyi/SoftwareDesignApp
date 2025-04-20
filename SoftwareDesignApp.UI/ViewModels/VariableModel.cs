@@ -9,13 +9,6 @@ public class VariableModel(string name, int value = 0) : BaseViewModel
     public int Value
     {
         get => _value;
-        set
-        {
-            if (_value != value)
-            {
-                _value = value;
-                OnPropertyChanged();
-            }
-        }
+        set => SetField(ref _value, value);
     }
 }
