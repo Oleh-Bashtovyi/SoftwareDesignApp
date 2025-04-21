@@ -4,9 +4,106 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SoftwareDesignApp.UI"
+        xmlns:components="clr-namespace:SoftwareDesignApp.UI.Components"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="Багатопотоковий редактор блок-схем" 
+        Height="600" 
+        Width="1200"
+        Background="#1E1E1E">
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="60"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="240"/>
+        </Grid.ColumnDefinitions>
 
+        <!-- Рядок команд -->
+        <WrapPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
+                   Background="#2D2D2D" Margin="10">
+            <Button x:Name="SaveButton" 
+                    Content="Зберегти" 
+                    Width="120" Height="30" 
+                    Margin="5" 
+                    Background="#3B5998" 
+                    Foreground="White" 
+                    BorderThickness="0" 
+                    FontFamily="Segoe UI"
+                    Click="Save"/>
+
+            <Button x:Name="OpenButton" 
+                    Content="Відкрити" 
+                    Width="120" Height="30" 
+                    Margin="5" 
+                    Background="#3B5998" 
+                    Foreground="White" 
+                    BorderThickness="0" 
+                    FontFamily="Segoe UI"
+                    Click="OpenFile"/>
+
+            <Button x:Name="RunButton" 
+                    Content="Запустити" 
+                    Width="120" Height="30" 
+                    Margin="5" 
+                    Background="#3B5998" 
+                    Foreground="White" 
+                    BorderThickness="0" 
+                    FontFamily="Segoe UI"
+                    Click="RunCode"/>
+
+            <Button x:Name="TestButton" 
+                    Content="Test" 
+                    Width="120" Height="30" 
+                    Margin="5" 
+                    Background="#3B5998" 
+                    Foreground="White" 
+                    BorderThickness="0" 
+                    FontFamily="Segoe UI"
+                    Click="RunTest"/>
+
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="NewPageButton" 
+                        Content="Нова сторінка" 
+                        Width="120" Height="30" 
+                        Margin="5" 
+                        Background="#3B5998" 
+                        Foreground="White" 
+                        BorderThickness="0" 
+                        FontFamily="Segoe UI"
+                        Click="NewPage"/>
+
+                <Button x:Name="DeleteTabButton" 
+                        Content="Видалити сторінку" 
+                        Width="120" Height="30" 
+                        Margin="5" 
+                        Background="#3B5998" 
+                        Foreground="White" 
+                        BorderThickness="0" 
+                        FontFamily="Segoe UI"
+                        Click="DeletePage"/>
+
+                <Button x:Name="ExitButton" 
+                        Content="Вихід" 
+                        Width="120" Height="30" 
+                        Margin="5" 
+                        Background="#3B5998" 
+                        Foreground="White" 
+                        BorderThickness="0" 
+                        FontFamily="Segoe UI"
+                        Click="ExitProgram"/>
+            </StackPanel>
+        </WrapPanel>
+
+        <!-- Вкладки для діаграм -->
+        <TabControl x:Name="tabs" 
+                    Grid.Row="1" Grid.Column="0" 
+                    Background="White" 
+                    Margin="10" SelectionChanged="tabs_SelectionChanged"/>
+
+        <components:SharedVariablesComponent
+            x:Name="SharedVariablesComponent"
+            Grid.Row="1" Grid.Column="1" />
     </Grid>
 </Window>

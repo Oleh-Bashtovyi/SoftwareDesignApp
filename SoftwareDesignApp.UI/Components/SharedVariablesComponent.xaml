@@ -1,0 +1,72 @@
+﻿<UserControl x:Class="SoftwareDesignApp.UI.Components.SharedVariablesComponent"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+             xmlns:local="clr-namespace:SoftwareDesignApp.UI.Components"
+             mc:Ignorable="d" 
+             d:DesignHeight="450" d:DesignWidth="800">
+    <StackPanel Grid.Row="1" Grid.Column="1" 
+                    Background="#2D2D2D" 
+                    Margin="10">
+        <Label Content="Спільні змінні:" 
+                   Foreground="White" 
+                   FontSize="12" 
+                   FontFamily="Segoe UI"/>
+
+        <ListBox ItemsSource="{Binding VariablesCollection}"
+                 Height="250"
+                 Margin="0,5,0,10"
+                 FontSize="12"
+                 FontFamily="Segoe UI"
+                 VerticalContentAlignment="Top"
+                 ScrollViewer.VerticalScrollBarVisibility="Auto"
+                 BorderThickness="1"
+                 BorderBrush="LightGray">
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <TextBlock Text="{Binding DisplayText}"
+                               TextWrapping="Wrap"/>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="AddVarButton" 
+                        Grid.Column="0" 
+                        Content="Додати" 
+                        Margin="5" 
+                        Background="#3B5998" 
+                        Foreground="White" 
+                        BorderThickness="0" 
+                        FontFamily="Segoe UI"
+                        Click="AddVariable"/>
+
+            <Button x:Name="EditVarButton" 
+                        Grid.Column="1" 
+                        Content="Редагувати" 
+                        Margin="5" 
+                        Background="#3B5998" 
+                        Foreground="White" 
+                        BorderThickness="0" 
+                        FontFamily="Segoe UI"
+                        Click="EditVariable"/>
+
+            <Button x:Name="DelVarButton" 
+                        Grid.Column="2" 
+                        Content="Видалити" 
+                        Margin="5" 
+                        Background="#3B5998" 
+                        Foreground="White" 
+                        BorderThickness="0" 
+                        FontFamily="Segoe UI"
+                        Click="DeleteVariable"/>
+        </Grid>
+    </StackPanel>
+</UserControl>
