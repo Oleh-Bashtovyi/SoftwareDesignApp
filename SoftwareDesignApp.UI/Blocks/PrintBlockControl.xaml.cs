@@ -23,4 +23,9 @@ public partial class PrintBlockControl : OneNextBlockControl
         _variable = variable;
         InitializeComponent();
     }
+
+    public override string GetDisplayText()
+    {
+        return $"Id:{BlockId}, {DiagramText}";
+    }
 }

@@ -47,4 +47,21 @@ public partial class ConditionBlockControl : BaseBlockControl
         _trueConditionNextBlock = trueConditionNextBlock;
         _falseConditionNextBlock = falseConditionNextBlock;
     }
+
+    public override void RemoveConnection(BaseBlockControl block)
+    {
+        if (TrueConditionNextBlock == block)
+        {
+            _trueConditionNextBlock = null;
+        }
+        else if (FalseConditionNextBlock == block)
+        {
+            _falseConditionNextBlock = null;
+        }
+    }
+
+    public override string GetDisplayText()
+    {
+        return $"Id:{BlockId}, {DiagramText}";
+    }
 }

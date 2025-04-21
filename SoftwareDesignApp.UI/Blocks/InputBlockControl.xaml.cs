@@ -23,5 +23,10 @@ public partial class InputBlockControl : OneNextBlockControl
         _var = var;
         InitializeComponent();
     }
+
+    public override string GetDisplayText()
+    {
+        return $"Id:{BlockId}, {DiagramText}";
+    }
 }
 

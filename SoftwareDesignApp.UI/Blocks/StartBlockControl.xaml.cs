@@ -10,5 +10,10 @@ public partial class StartBlockControl : OneNextBlockControl
     {
         InitializeComponent();
     }
+
+    public override string GetDisplayText()
+    {
+        return $"Id:{BlockId}, {DiagramText}";
+    }
 }
 

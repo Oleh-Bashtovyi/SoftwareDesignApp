@@ -43,4 +43,13 @@ public static class Dialogs
         window.ShowDialog();
         return window.SelectedVariable;
     }
+
+    public static T? SelectDialog<T>(Window parent, List<GenericSelectDialog.ComboBoxItemModel> items, string prompt, string title) where T : class
+    {
+        var genericDialog = new GenericSelectDialog(items, prompt, title);
+        genericDialog.Owner = parent;
+        genericDialog.ShowDialog();
+
+        return genericDialog.SelectedItem?.Id as T;
+    }
 }

@@ -1,8 +1,7 @@
-﻿using SoftwareDesignApp.UI.Blocks.Base;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using SoftwareDesignApp.GUI.BlocksNew;
+﻿using SoftwareDesignApp.GUI.BlocksNew;
 using SoftwareDesignApp.UI.Blocks;
+using SoftwareDesignApp.UI.Blocks.Base;
+using System.Windows.Controls;
 
 namespace SoftwareDesignApp.UI.ViewModels;
 

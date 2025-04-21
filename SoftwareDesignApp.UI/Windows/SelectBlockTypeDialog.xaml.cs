@@ -28,7 +28,6 @@ public partial class SelectBlockTypeDialog : Window
 
         BlockTypes =
         [
-            new() { Text = "Початок (Start)", Id = typeof(StartBlockControl) },
             new() { Text = "Присвоєння (A = B)", Id = typeof(AssignmentBlockControl) },
             new() { Text = "Константа (A = 5)", Id = typeof(ConstantBlockControl) },
             new() { Text = "Введення (INPUT A)", Id = typeof(InputBlockControl) },

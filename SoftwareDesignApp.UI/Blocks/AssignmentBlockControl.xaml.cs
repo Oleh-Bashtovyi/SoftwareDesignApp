@@ -28,5 +28,10 @@ public partial class AssignmentBlockControl : OneNextBlockControl
         _var2 = var2;
         InitializeComponent();
     }
+
+    public override string GetDisplayText()
+    {
+        return $"Id:{BlockId}, {DiagramText}";
+    }
 }
 

@@ -6,6 +6,7 @@ namespace SoftwareDesignApp.UI.Blocks.Base;
 
 public class BaseBlockControl : UserControl, INotifyPropertyChanged
 {
+    private readonly List<BaseBlockControl> _incomingBlocks = [];
     private bool _isSelected;
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -31,6 +32,30 @@ public class BaseBlockControl : UserControl, INotifyPropertyChanged
     public void UnMarkAsSelected()
     {
         IsSelected = false;
+    }
+
+    public virtual string GetDisplayText()
+    {
+        return string.Empty;
+    }
+
+    public IReadOnlyCollection<BaseBlockControl> GetIncomingBlocks()
+    {
+        return _incomingBlocks;
+    }
+
+    public void AddIncomingBlock(BaseBlockControl incomingBlock)
+    {
+        _incomingBlocks.Add(incomingBlock);
+    }
+
+    public void RemoveIncomingBlock(BaseBlockControl incomingBlock)
+    {
+        _incomingBlocks.Remove(incomingBlock);
+    }
+
+    public virtual void RemoveConnection(BaseBlockControl block)
+    {
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

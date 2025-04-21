@@ -27,4 +27,9 @@ public partial class ConstantBlockControl : OneNextBlockControl
         _value = value;
         InitializeComponent();
     }
+
+    public override string GetDisplayText()
+    {
+        return $"Id:{BlockId}, {DiagramText}";
+    }
 }

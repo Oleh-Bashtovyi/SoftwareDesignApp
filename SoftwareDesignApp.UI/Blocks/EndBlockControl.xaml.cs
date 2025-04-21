@@ -10,5 +10,10 @@ public partial class EndBlockControl : BaseBlockControl
     {
         InitializeComponent();
     }
+
+    public override string GetDisplayText()
+    {
+        return $"Id:{BlockId}, {DiagramText}";
+    }
 }
 
