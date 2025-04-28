@@ -26,8 +26,8 @@ public class CodeGenerator
         code.AppendLine("using System.Threading;");
         code.AppendLine("using System.Threading.Tasks;");
         code.AppendLine();
-        code.AppendLine("// Автоматично згенерований код з блок-схем");
-        code.AppendLine($"// Згенеровано: {DateTime.Now}");
+        code.AppendLine("// Automatically generated code from flowcharts");
+        code.AppendLine($"// Generated: {DateTime.Now}");
         code.AppendLine();
         code.AppendLine("namespace GeneratedMultithreadedProgram");
         code.AppendLine("{");
@@ -35,7 +35,6 @@ public class CodeGenerator
         code.AppendLine("    {");
 
         // Оголошення спільних змінних
-        code.AppendLine("        // Спільні змінні");
         foreach (var variable in sharedVariables)
         {
             code.AppendLine($"        private static int {variable} = 0;");
@@ -43,7 +42,6 @@ public class CodeGenerator
         code.AppendLine();
 
         // Додаємо об'єкт синхронізації
-        //code.AppendLine("        // Об'єкт синхронізації для потокобезпечності");
         code.AppendLine("        private static readonly object _syncLock = new object();");
         code.AppendLine();
 
@@ -58,7 +56,6 @@ public class CodeGenerator
             code.AppendLine("        {");
             code.AppendLine("            try");
             code.AppendLine("            {");
-            //code.AppendLine("                // Потокобезпечний доступ до спільних змінних");
             code.AppendLine("                lock (_syncLock)");
             code.AppendLine("                {");
 
@@ -71,16 +68,12 @@ public class CodeGenerator
                     code.AppendLine(blockCode);
                 }
             }
-            else
-            {
-                //code.AppendLine("                    // Для цього потоку не визначено блоків");
-            }
 
             code.AppendLine("                }");
             code.AppendLine("            }");
             code.AppendLine("            catch (Exception ex)");
             code.AppendLine("            {");
-            code.AppendLine($"                Console.WriteLine($\"Помилка в {threadName}: {{ex.Message}}\");");
+            code.AppendLine($"                Console.WriteLine($\"Error in {threadName}: {{ex.Message}}\");");
             code.AppendLine("            }");
             code.AppendLine("        }");
             code.AppendLine();
@@ -91,7 +84,7 @@ public class CodeGenerator
         code.AppendLine("        {");
         code.AppendLine("            try");
         code.AppendLine("            {");
-        code.AppendLine("                Console.WriteLine(\"Запуск багатопотокової програми...\");");
+        code.AppendLine("                Console.WriteLine(\"Starting multithreaded program...\");");
         code.AppendLine("                var tasks = new List<Task>();");
         code.AppendLine();
 
@@ -102,24 +95,23 @@ public class CodeGenerator
                 ? threads[i].Name
                 : $"Thread_{i + 1}";
 
-            code.AppendLine($"                Console.WriteLine(\"Запуск {threadName}...\");");
+            code.AppendLine($"                Console.WriteLine(\"Starting {threadName}...\"");)
             code.AppendLine($"                var task{i + 1} = Task.Run(() => {threadName}());");
             code.AppendLine($"                tasks.Add(task{i + 1});");
             code.AppendLine();
         }
 
         // Чекання завершення всіх потоків
-        //code.AppendLine("                // Чекати завершення всіх потоків");
         code.AppendLine("                Task.WaitAll(tasks.ToArray());");
-        code.AppendLine("                Console.WriteLine(\"Всі потоки завершено.\");");
+        code.AppendLine("                Console.WriteLine(\"All threads completed.\");");
         code.AppendLine("            }");
         code.AppendLine("            catch (Exception ex)");
         code.AppendLine("            {");
-        code.AppendLine("                Console.WriteLine($\"Помилка в Main: {ex.Message}\");");
+        code.AppendLine("                Console.WriteLine($\"Error in Main: {ex.Message}\");");
         code.AppendLine("            }");
         code.AppendLine("            finally");
         code.AppendLine("            {");
-        code.AppendLine("                Console.WriteLine(\"Натисніть будь-яку клавішу для виходу...\");");
+        code.AppendLine("                Console.WriteLine(\"Press any key to exit...\");");
         //code.AppendLine("                Console.ReadKey();");
         code.AppendLine("            }");
         code.AppendLine("        }");
