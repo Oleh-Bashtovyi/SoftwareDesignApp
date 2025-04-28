@@ -1,31 +1,26 @@
-﻿using SoftwareDesignApp.Core;
+﻿using System.Collections.Generic;
+using System;
 using System.Text;
+
+namespace SoftwareDesignApp.Core;
 
 public class CodeGenerator
 {
-    private readonly string _filepath;
+    public CodeGenerator() { }
 
-    public CodeGenerator(string filename)
+    public string GenerateCode(List<DiagramThread> threads)
     {
-        string directory = Path.Combine(Path.GetDirectoryName(AppDomain.CurrentDomain.BaseDirectory) ?? "", "Generated");
-        Directory.CreateDirectory(directory);
-        _filepath = Path.Combine(directory, filename);
-    }
-
-    public void GenerateCode(List<DiagramThread> threads)
-    {
-        // Sort blocks in each thread to ensure proper code generation
         foreach (var thread in threads)
         {
             thread.ChekStartBlock();
         }
 
-        // Зібрати всі використані змінні з блоків
+        // Збираємо всі змінні, що використовуються в блоках
         var sharedVariables = CollectSharedVariables(threads);
 
         StringBuilder code = new StringBuilder();
 
-        // Додати заголовки
+        // Додаємо заголовки
         code.AppendLine("using System;");
         code.AppendLine("using System.Collections.Generic;");
         code.AppendLine("using System.Threading;");
@@ -39,7 +34,7 @@ public class CodeGenerator
         code.AppendLine("    class Program");
         code.AppendLine("    {");
 
-        // Оголосити спільні змінні
+        // Оголошення спільних змінних
         code.AppendLine("        // Спільні змінні");
         foreach (var variable in sharedVariables)
         {
@@ -47,12 +42,12 @@ public class CodeGenerator
         }
         code.AppendLine();
 
-        // Додати об'єкт синхронізації
-        code.AppendLine("        // Об'єкт синхронізації для потокобезпечності");
+        // Додаємо об'єкт синхронізації
+        //code.AppendLine("        // Об'єкт синхронізації для потокобезпечності");
         code.AppendLine("        private static readonly object _syncLock = new object();");
         code.AppendLine();
 
-        // Генерувати методи потоків
+        // Генерація методів для потоків
         for (int i = 0; i < threads.Count; i++)
         {
             string threadName = !string.IsNullOrEmpty(threads[i].Name)
@@ -63,11 +58,11 @@ public class CodeGenerator
             code.AppendLine("        {");
             code.AppendLine("            try");
             code.AppendLine("            {");
-            code.AppendLine("                // Потокобезпечний доступ до спільних змінних");
+            //code.AppendLine("                // Потокобезпечний доступ до спільних змінних");
             code.AppendLine("                lock (_syncLock)");
             code.AppendLine("                {");
 
-            // Генерувати код для кожного блоку
+            // Генерація коду для кожного блоку
             if (threads[i].Blocks.Count > 0)
             {
                 foreach (var block in threads[i].Blocks)
@@ -78,7 +73,7 @@ public class CodeGenerator
             }
             else
             {
-                code.AppendLine("                    // Для цього потоку не визначено блоків");
+                //code.AppendLine("                    // Для цього потоку не визначено блоків");
             }
 
             code.AppendLine("                }");
@@ -91,7 +86,7 @@ public class CodeGenerator
             code.AppendLine();
         }
 
-        // Генерувати метод Main
+        // Генерація методу Main
         code.AppendLine("        static void Main(string[] args)");
         code.AppendLine("        {");
         code.AppendLine("            try");
@@ -100,7 +95,7 @@ public class CodeGenerator
         code.AppendLine("                var tasks = new List<Task>();");
         code.AppendLine();
 
-        // Створити потоки
+        // Створення потоків
         for (int i = 0; i < threads.Count; i++)
         {
             string threadName = !string.IsNullOrEmpty(threads[i].Name)
@@ -113,8 +108,8 @@ public class CodeGenerator
             code.AppendLine();
         }
 
-        // Чекати завершення всіх потоків
-        code.AppendLine("                // Чекати завершення всіх потоків");
+        // Чекання завершення всіх потоків
+        //code.AppendLine("                // Чекати завершення всіх потоків");
         code.AppendLine("                Task.WaitAll(tasks.ToArray());");
         code.AppendLine("                Console.WriteLine(\"Всі потоки завершено.\");");
         code.AppendLine("            }");
@@ -125,15 +120,13 @@ public class CodeGenerator
         code.AppendLine("            finally");
         code.AppendLine("            {");
         code.AppendLine("                Console.WriteLine(\"Натисніть будь-яку клавішу для виходу...\");");
-        code.AppendLine("                Console.ReadKey();");
+        //code.AppendLine("                Console.ReadKey();");
         code.AppendLine("            }");
         code.AppendLine("        }");
         code.AppendLine("    }");
         code.AppendLine("}");
 
-        // Зберегти згенерований код у файл
-        File.WriteAllText(_filepath, code.ToString());
-        Console.WriteLine($"Код успішно згенеровано до: {_filepath}");
+        return code.ToString();
     }
 
     private HashSet<string> CollectSharedVariables(List<DiagramThread> threads)
