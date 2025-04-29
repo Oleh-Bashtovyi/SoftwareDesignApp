@@ -7,6 +7,7 @@ using Microsoft.Win32;
 using Newtonsoft.Json;
 using SoftwareDesignApp.Core;
 using SoftwareDesignApp.UI.Components;
+using SoftwareDesignApp.UI.Windows;
 using Formatting = System.Xml.Formatting;
 
 namespace SoftwareDesignApp.UI;
@@ -105,8 +106,41 @@ public partial class MainWindow : Window
 
     private void RunCode(object sender, RoutedEventArgs e)
     {
+        try
+        {
+            var dialog = new SaveFileDialog
+            {
+                Title = "Оберіть файл для запуску коду",
+                DefaultExt = ".cs",
+                Filter = "C# і текстові файли (*.cs, *.txt)|*.cs;*.txt|Усі файли (*.*)|*.*"
+            };
 
+            if (dialog.ShowDialog() == true)
+            {
+                var compilationService = new CompilationService();
+                string filePath = dialog.FileName;
+                string code = File.ReadAllText(filePath);
+                var result = compilationService.CompileAndExecuteFromString(code);
+
+                if (result.Success)
+                {
+                    var window = new ResultWindow(result.Output);
+                    window.ShowDialog();
+                }
+                else
+                {
+                    MessageBox.Show($"Виникла помилка під час компіляції: {result.ErrorMessage}");
+                }
+            }
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show("Error occured: " + exception.Message);
+        }
     }
+
+
+
 
     private void RunTest(object sender, RoutedEventArgs e)
     {
@@ -203,6 +237,7 @@ public partial class MainWindow : Window
         {
             var dialog = new SaveFileDialog
             {
+                Title = "Оберіть файл для збереження трансльованого коду",
                 FileName = "TranslatedResult.cs",
                 DefaultExt = ".cs",
                 Filter = "C# і текстові файли (*.cs, *.txt)|*.cs;*.txt|Усі файли (*.*)|*.*"
