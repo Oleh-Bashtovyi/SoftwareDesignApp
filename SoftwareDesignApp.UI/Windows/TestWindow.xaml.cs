@@ -2,55 +2,97 @@
 using System.IO;
 using System.Text.Json;
 using System.Windows;
+using SoftwareDesignApp.Core;
 
 namespace SoftwareDesignApp.UI.Windows;
 
 public partial class TestWindow : Window
 {
     private TestManager testManager;
-    private Tester tester;
     private string codePath;
+    private string testPath;
     private int kValue = 10; // значення K (за замовчуванням)
+    private List<TestCase> testCases = new List<TestCase>();
     private List<LogEntry> logs = new List<LogEntry>();
 
     public TestWindow()
     {
         InitializeComponent();
-
-        // Робимо вікно модальним
-        this.Topmost = true;
-        this.Focus();
-
-        // Ініціалізуємо класи для роботи з тестами
-        testManager = new TestManager(); // використовує папку testing/test за замовчуванням
-        tester = new Tester();
+        testManager = new TestManager(); 
     }
 
     private void LoadTests_Click(object sender, RoutedEventArgs e)
     {
-        List<string> foundTests = testManager.FindExistingTests();
-        if (foundTests.Count > 0)
-        {
-            testManager.LoadTestsFromJson(foundTests[0]);
-            AddLog($"Loaded tests from: {foundTests[0]}");
-            StatusLabel.Content = $"Tests loaded: {Path.GetFileName(foundTests[0])}";
-        }
-        else
+        try
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
                 Title = "Select JSON test file",
-                InitialDirectory = Path.Combine(Directory.GetCurrentDirectory(), "testing", "test"),
+                InitialDirectory = Directory.GetCurrentDirectory(),
                 Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*"
             };
 
             if (openFileDialog.ShowDialog() == true)
             {
                 string filePath = openFileDialog.FileName;
-                testManager.LoadTestsFromJson(filePath);
-                AddLog($"Loaded tests from: {filePath}");
-                StatusLabel.Content = $"Tests loaded: {Path.GetFileName(filePath)}";
+                var content = File.ReadAllText(filePath);
+                testCases = JsonSerializer.Deserialize<List<TestCase>>(content);
+                if (testCases != null)
+                {
+                    AddLog($"Loaded tests from: {filePath}");
+                    StatusLabel.Content = $"Tests loaded: {Path.GetFileName(filePath)}";
+                }
+                else
+                {
+                    MessageBox.Show("Failed to load tests. Please check the file format.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
             }
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show($"Error loading tests: {exception.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+
+
+    private void RunTests_Click(object sender, RoutedEventArgs e)
+    {
+        if (!testCases.Any())
+        {
+            AddLog("No tests loaded. Please load tests first.");
+            return;
+        }
+        if (string.IsNullOrEmpty(codePath))
+        {
+            AddLog("No code file loaded. Please load a code file to test.");
+            return;
+        }
+
+        AddLog("Starting tests...");
+        try
+        {
+            var code = File.ReadAllText(codePath);
+            var testResults = testManager.RunTests(code, testCases, kValue);
+            int passedCount = 0;
+            int totalVariants = 0;
+
+            foreach (var testData in testResults)
+            {
+                totalVariants += testData.Attempts;
+                passedCount += testData.SuccessCount;
+            }
+
+            var coveragePercent = (double)passedCount / totalVariants * 100;
+
+            string summary = $"Test Summary:\n" +
+                $"Passed (OK): {passedCount} / {totalVariants}\n" +
+                $"Coverage for <= {kValue} steps: {coveragePercent:F2}%";
+            AddLog(summary);
+        }
+        catch (Exception ex)
+        {
+            AddLog($"Error during testing: {ex.Message}");
         }
     }
 
@@ -59,7 +101,8 @@ public partial class TestWindow : Window
         OpenFileDialog openFileDialog = new OpenFileDialog
         {
             Title = "Select code file to test",
-            Filter = "Python files (*.py;*.txt)|*.py;*.txt|All files (*.*)|*.*",
+            Filter = "C# і текстові файли (*.cs, *.txt)|*.cs;*.txt|Усі файли (*.*)|*.*",
+            DefaultExt = ".cs",
             InitialDirectory = Directory.GetCurrentDirectory()
         };
 
@@ -95,67 +138,6 @@ public partial class TestWindow : Window
         catch (Exception)
         {
             AddLog("Invalid input for K.");
-        }
-    }
-
-    private void RunTests_Click(object sender, RoutedEventArgs e)
-    {
-        if (!testManager.TestsLoaded())
-        {
-            AddLog("No tests loaded. Please load tests first.");
-            return;
-        }
-        if (string.IsNullOrEmpty(codePath))
-        {
-            AddLog("No code file loaded. Please load a code file to test.");
-            return;
-        }
-
-        AddLog("Starting tests...");
-        try
-        {
-            var testResults = tester.RunTests(codePath, testManager.GetTests(), kValue);
-            double coveragePercent = testResults.CoveragePercent;
-
-            int passedCount = 0;
-            int totalVariants = 0;
-
-            foreach (var testData in testResults.TestData)
-            {
-                foreach (var variantInfo in testData.Log)
-                {
-                    totalVariants++;
-                    if (variantInfo.Status == "OK")
-                    {
-                        passedCount++;
-                    }
-                }
-            }
-
-            string summary = $"Test Summary:\n" +
-                $"Passed (OK): {passedCount} / {totalVariants}\n" +
-                $"Coverage for <= {kValue} steps: {coveragePercent:F2}%";
-            AddLog(summary);
-
-            for (int i = 0; i < testResults.TestData.Count; i++)
-            {
-                var testData = testResults.TestData[i];
-                AddLog($"Test #{i + 1}: executed {testData.VariantsExecuted} variants, " +
-                       $"correct: {testData.CorrectVariants}, " +
-                       $"coverage: {testData.CoveragePercent:F2}%");
-
-                foreach (var variantInfo in testData.Log)
-                {
-                    int varNum = variantInfo.Variant;
-                    string varStatus = variantInfo.Status;
-                    string varOutput = variantInfo.Output.Trim();
-                    AddLog($"  Variant #{varNum}: {varStatus} (output: {varOutput})");
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            AddLog($"Error during testing: {ex.Message}");
         }
     }
 
@@ -240,7 +222,65 @@ public class LogEntry
 }
 
 
+public class TestCase
+{
+    public string ExpectedResult { get; set; }
+}
+
+public class TestCaseResult
+{
+    public string Code { get; set; }
+    public string ExpectedResult { get; set; }
+    public int Attempts { get; set; }
+    public int SuccessCount { get; set; }
+    public double CoveragePercent => SuccessCount / (double)Attempts * 100;
+}
+
+
 public class TestManager
+{
+    public List<TestCaseResult> RunTests(string code, List<TestCase> testCases, int attempts)
+    {
+        var results = new List<TestCaseResult>();
+
+        foreach (var testCase in testCases)
+        {
+            var testCaseResult = new TestCaseResult();
+            var expectedValue = testCase.ExpectedResult.Replace("\r", "");
+            var codeCompiler = new CompilationService();
+
+            for (int i = 0; i < attempts; i++)
+            {
+                var compiledCode = codeCompiler.CompileAndExecuteFromString(code);
+                var rawOutput = compiledCode.Output.Replace("\r", "").Trim();
+                var lines = rawOutput.Split('\n');
+
+                string cleanedOutput = rawOutput;
+                if (lines.Length >= 3)
+                {
+                    cleanedOutput = string.Join("\n", lines.Skip(1).Where(x => !string.IsNullOrWhiteSpace(x)).Take(lines.Length - 3));
+                }
+
+                if (cleanedOutput == expectedValue)
+                {
+                    testCaseResult.SuccessCount++;
+                }
+
+                testCaseResult.Attempts++;
+            }
+            testCaseResult.Code = code;
+            testCaseResult.ExpectedResult = expectedValue;
+            results.Add(testCaseResult);
+        }
+
+        return results;
+    }
+}
+
+
+
+
+/*public class TestManager
 {
     public List<string> FindExistingTests()
     {
@@ -275,7 +315,6 @@ public class Tester
     }
 }
 
-// Класи для результатів тестування
 public class TestResult
 {
     public List<TestData> TestData { get; set; } = new List<TestData>();
@@ -295,4 +334,4 @@ public class VariantInfo
     public int Variant { get; set; }
     public string Status { get; set; }
     public string Output { get; set; }
-}
+}*/

@@ -144,7 +144,8 @@ public partial class MainWindow : Window
 
     private void RunTest(object sender, RoutedEventArgs e)
     {
-        throw new NotImplementedException();
+        var testWindow = new TestWindow();
+        testWindow.ShowDialog();
     }
 
     private void ExitProgram(object sender, RoutedEventArgs e)
@@ -184,7 +185,7 @@ public partial class MainWindow : Window
         var editor = new DiagramCanvasComponent(diagramViewModel);
 
         // Додавання початкового блоку
-        var startBlock = new StartBlockControl("1");
+        var startBlock = new StartBlockControl("Start");
         editor.AddBlock(startBlock);
         Canvas.SetLeft(startBlock, 250);
         Canvas.SetTop(startBlock, 50);
