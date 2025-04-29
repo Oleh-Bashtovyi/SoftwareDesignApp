@@ -1,12 +1,8 @@
-﻿using Microsoft.CodeAnalysis.CSharp;
-using Microsoft.CodeAnalysis;
-using System.Text;
-
-namespace SoftwareDesignApp.Core
+﻿namespace SoftwareDesignApp.Core
 {
     public class DiagramProcessor
     {
-        public string ProcessThreads(List<(string threadName, List<Block> blocks)> threadData)
+        public string ProcessThreads(List<(string threadName, List<Block> blocks)> threadData, Dictionary<string, int>? sharedVariablessss = null)
         {
             var threads = new List<DiagramThread>();
 
@@ -30,7 +26,7 @@ namespace SoftwareDesignApp.Core
             }
 
             var generator = new CodeGenerator();
-            string resultCode = generator.GenerateCode(threads);
+            string resultCode = generator.GenerateCode(threads, sharedVariablessss);
 
             return resultCode;
         }
