@@ -6,7 +6,7 @@ public class CodeGenerator
 {
     public CodeGenerator() { }
 
-    public string GenerateCode(List<DiagramThread> threads)
+    public string GenerateCode(List<DiagramThread> threads, Dictionary<string, int>? sharedVariablessss = null)
     {
         foreach (var thread in threads)
         {
@@ -15,6 +15,14 @@ public class CodeGenerator
 
         // Збираємо всі змінні, що використовуються в блоках
         var sharedVariables = CollectSharedVariables(threads);
+
+        if (sharedVariablessss != null)
+        {
+            foreach (var item in sharedVariablessss)
+            {
+                sharedVariables[item.Key] = item.Value;
+            }
+        }
 
         StringBuilder code = new StringBuilder();
 
