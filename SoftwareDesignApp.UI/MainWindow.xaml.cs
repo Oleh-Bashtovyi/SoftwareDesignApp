@@ -5,6 +5,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
 using Newtonsoft.Json;
+using SoftwareDesignApp.Core;
 using SoftwareDesignApp.UI.Components;
 using Formatting = System.Xml.Formatting;
 
@@ -200,10 +201,25 @@ public partial class MainWindow : Window
     {
         try
         {
-            var diagramThread = _tabEditors.Values.Select(x => x.ViewModel.ToDiagramThread()).ToList();
-            var codeGenerator = new CodeGenerator("GeneratedCode");
-            codeGenerator.GenerateCode(diagramThread);
-            MessageBox.Show("успішно створено!");
+            var dialog = new SaveFileDialog
+            {
+                FileName = "TranslatedResult.cs",
+                DefaultExt = ".cs",
+                Filter = "C# і текстові файли (*.cs, *.txt)|*.cs;*.txt|Усі файли (*.*)|*.*"
+            };
+
+            if (dialog.ShowDialog() == true)
+            {
+                string filePath = dialog.FileName;
+
+
+                var diagramThread = _tabEditors.Values.Select(x => x.ViewModel.ToDiagramThread()).ToList();
+                var codeGenerator = new CodeGenerator();
+                var code = codeGenerator.GenerateCode(diagramThread); 
+                File.WriteAllText(filePath, code);
+                MessageBox.Show("успішно трансльовано!");
+
+            }
         }
         catch (Exception exception)
         {

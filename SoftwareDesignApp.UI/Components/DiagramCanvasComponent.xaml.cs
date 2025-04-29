@@ -84,7 +84,9 @@ public partial class DiagramCanvasComponent : UserControl
 
     private void AddBlock(object sender, MouseButtonEventArgs e)
     {
-        string blockId = (_blockIdCounter++ + 1).ToString();
+        //string blockId = (_blockIdCounter++ + 1).ToString();
+        string blockId = $"Block_{_blockIdCounter}";
+        _blockIdCounter++;
         Point position = e.GetPosition(this);
 
         var parentWindow = Window.GetWindow(this);
