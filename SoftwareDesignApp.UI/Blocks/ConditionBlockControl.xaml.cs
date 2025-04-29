@@ -1,4 +1,5 @@
-﻿using SoftwareDesignApp.UI.Blocks.Base;
+﻿using SoftwareDesignApp.Core;
+using SoftwareDesignApp.UI.Blocks.Base;
 
 namespace SoftwareDesignApp.UI.Blocks;
 
@@ -46,5 +47,28 @@ public partial class ConditionBlockControl : BaseBlockControl
     {
         _trueConditionNextBlock = trueConditionNextBlock;
         _falseConditionNextBlock = falseConditionNextBlock;
+    }
+
+    public override void RemoveConnection(BaseBlockControl block)
+    {
+        if (TrueConditionNextBlock == block)
+        {
+            _trueConditionNextBlock = null;
+        }
+        else if (FalseConditionNextBlock == block)
+        {
+            _falseConditionNextBlock = null;
+        }
+    }
+
+    public override Block ToCoreBlock()
+    {
+        return new ConditionBlock(BlockId, Var, Condition, Value.ToString(), TrueConditionNextBlock?.BlockId,
+            FalseConditionNextBlock.BlockId);
+    }
+
+    public override string GetDisplayText()
+    {
+        return $"Id:{BlockId}, {DiagramText}";
     }
 }

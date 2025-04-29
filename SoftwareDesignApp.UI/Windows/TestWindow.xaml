@@ -1,0 +1,91 @@
+﻿<Window x:Class="SoftwareDesignApp.UI.Windows.TestWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SoftwareDesignApp.UI.Windows"
+        mc:Ignorable="d"
+       Title="Test Runner and Logs" Height="650" Width="850"
+        Background="#1E1E1E" Opacity="0.95">
+    <Window.Resources>
+        <Style TargetType="Button">
+            <Setter Property="Background" Value="#007ACC"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Padding" Value="10,5"/>
+            <Setter Property="Margin" Value="5"/>
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                CornerRadius="8" 
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#0098FF"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style TargetType="TextBox">
+            <Setter Property="Background" Value="#252526"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderBrush" Value="#3E3E42"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="14"/>
+        </Style>
+
+        <Style TargetType="Label">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontSize" Value="12"/>
+        </Style>
+
+        <Style TargetType="Border">
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Background" Value="#252526"/>
+            <Setter Property="BorderBrush" Value="#3E3E42"/>
+            <Setter Property="BorderThickness" Value="1"/>
+        </Style>
+    </Window.Resources>
+
+    <Grid Margin="15">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Рамка для кнопок керування -->
+        <Border Grid.Row="0" Padding="5">
+            <StackPanel Orientation="Horizontal">
+                <Button Content="Load Tests" Click="LoadTests_Click"/>
+                <Button Content="Load Code" Click="LoadCode_Click"/>
+                <Button Content="Set K" Click="SetK_Click"/>
+                <Button Content="Run Tests" Click="RunTests_Click"/>
+                <Button Content="Save Logs" Click="SaveLogs_Click"/>
+                <Button Content="Load Logs" Click="LoadLogs_Click"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Рамка для статусу -->
+        <Border Grid.Row="1" Margin="0,10,0,10" Padding="10">
+            <Label x:Name="StatusLabel" Content="No tests or code loaded."/>
+        </Border>
+
+        <!-- Рамка для логування -->
+        <Border Grid.Row="2" Padding="10">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <TextBox x:Name="LogTextBox" TextWrapping="Wrap" IsReadOnly="True"/>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>

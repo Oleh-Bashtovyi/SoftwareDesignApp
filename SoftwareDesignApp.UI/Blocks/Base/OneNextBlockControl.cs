@@ -23,4 +23,12 @@ public class OneNextBlockControl(string blockId) : BaseBlockControl(blockId)
     {
         NextBlock = null;
     }
+
+    public override void RemoveConnection(BaseBlockControl block)
+    {
+        if (_nextBlock == block)
+        {
+            _nextBlock = null;
+        }
+    }
 }

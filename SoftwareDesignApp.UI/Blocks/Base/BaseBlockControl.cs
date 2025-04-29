@@ -1,11 +1,13 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
+using SoftwareDesignApp.Core;
 
 namespace SoftwareDesignApp.UI.Blocks.Base;
 
 public class BaseBlockControl : UserControl, INotifyPropertyChanged
 {
+    private readonly List<BaseBlockControl> _incomingBlocks = [];
     private bool _isSelected;
 
     public event PropertyChangedEventHandler? PropertyChanged;
@@ -31,6 +33,35 @@ public class BaseBlockControl : UserControl, INotifyPropertyChanged
     public void UnMarkAsSelected()
     {
         IsSelected = false;
+    }
+
+    public virtual string GetDisplayText()
+    {
+        return string.Empty;
+    }
+
+    public IReadOnlyCollection<BaseBlockControl> GetIncomingBlocks()
+    {
+        return _incomingBlocks;
+    }
+
+    public void AddIncomingBlock(BaseBlockControl incomingBlock)
+    {
+        _incomingBlocks.Add(incomingBlock);
+    }
+
+    public void RemoveIncomingBlock(BaseBlockControl incomingBlock)
+    {
+        _incomingBlocks.Remove(incomingBlock);
+    }
+
+    public virtual void RemoveConnection(BaseBlockControl block)
+    {
+    }
+
+    public virtual Block ToCoreBlock()
+    {
+        throw new NotImplementedException("Can not create core block from base block control");
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)
