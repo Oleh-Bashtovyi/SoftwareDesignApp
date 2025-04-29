@@ -101,7 +101,7 @@ public class CodeGenerator
                 ? threads[i].Name
                 : $"Thread_{i + 1}";
 
-            code.AppendLine($"                Console.WriteLine(\"Starting {threadName}...\"");
+            code.AppendLine($"                Console.WriteLine(\"Starting {threadName}...\");");
             code.AppendLine($"                var task{i + 1} = Task.Run(() => {threadName}());");
             code.AppendLine($"                tasks.Add(task{i + 1});");
             code.AppendLine();

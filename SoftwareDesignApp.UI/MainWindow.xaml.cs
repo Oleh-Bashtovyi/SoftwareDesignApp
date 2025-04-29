@@ -250,7 +250,7 @@ public partial class MainWindow : Window
 
                 var diagramThread = _tabEditors.Values.Select(x => x.ViewModel.ToDiagramThread()).ToList();
                 var codeGenerator = new CodeGenerator();
-                var code = codeGenerator.GenerateCode(diagramThread); 
+                var code = codeGenerator.GenerateCode(diagramThread, _sharedVariables.GetVariables().ToDictionary()); 
                 File.WriteAllText(filePath, code);
                 MessageBox.Show("успішно трансльовано!");
 
