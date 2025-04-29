@@ -2,6 +2,7 @@
 using SoftwareDesignApp.UI.Blocks;
 using SoftwareDesignApp.UI.Blocks.Base;
 using System.Windows.Controls;
+using SoftwareDesignApp.Core;
 
 namespace SoftwareDesignApp.UI.ViewModels;
 
@@ -35,6 +36,15 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
 
     public IReadOnlyCollection<BaseBlockControl> GetBlocks() => _blocks;
 
+
+
+    public DiagramThread ToDiagramThread()
+    {
+        var diagramThread = new DiagramThread(Name);
+        diagramThread.Blocks = _blocks.Select(x => x.ToCoreBlock()).ToList();
+        diagramThread.StartBlock = _blocks.First(x => x is StartBlockControl).ToCoreBlock();
+        return diagramThread;
+    }
 
     public Dictionary<string, object> ToDict()
     {

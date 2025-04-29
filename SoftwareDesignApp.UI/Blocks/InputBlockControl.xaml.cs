@@ -1,4 +1,5 @@
-﻿using SoftwareDesignApp.UI.Blocks.Base;
+﻿using SoftwareDesignApp.Core;
+using SoftwareDesignApp.UI.Blocks.Base;
 
 namespace SoftwareDesignApp.UI.Blocks;
 
@@ -22,6 +23,11 @@ public partial class InputBlockControl : OneNextBlockControl
     {
         _var = var;
         InitializeComponent();
+    }
+
+    public override Block ToCoreBlock()
+    {
+        return new InputBlock(BlockId, Var, NextBlock?.BlockId);
     }
 
     public override string GetDisplayText()

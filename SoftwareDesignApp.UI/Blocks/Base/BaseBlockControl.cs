@@ -1,6 +1,7 @@
 ﻿using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Controls;
+using SoftwareDesignApp.Core;
 
 namespace SoftwareDesignApp.UI.Blocks.Base;
 
@@ -56,6 +57,11 @@ public class BaseBlockControl : UserControl, INotifyPropertyChanged
 
     public virtual void RemoveConnection(BaseBlockControl block)
     {
+    }
+
+    public virtual Block ToCoreBlock()
+    {
+        throw new NotImplementedException("Can not create core block from base block control");
     }
 
     protected virtual void OnPropertyChanged([CallerMemberName] string? propertyName = null)

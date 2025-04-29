@@ -1,4 +1,5 @@
-﻿using SoftwareDesignApp.UI.Blocks.Base;
+﻿using SoftwareDesignApp.Core;
+using SoftwareDesignApp.UI.Blocks.Base;
 
 namespace SoftwareDesignApp.UI.Blocks;
 
@@ -22,6 +23,11 @@ public partial class PrintBlockControl : OneNextBlockControl
     {
         _variable = variable;
         InitializeComponent();
+    }
+
+    public override Block ToCoreBlock()
+    {
+        return new PrintBlock(BlockId, Variable, NextBlock?.BlockId);
     }
 
     public override string GetDisplayText()

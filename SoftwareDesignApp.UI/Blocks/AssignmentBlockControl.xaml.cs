@@ -1,4 +1,5 @@
 ﻿using System.Windows.Media;
+using SoftwareDesignApp.Core;
 using SoftwareDesignApp.UI.Blocks.Base;
 
 namespace SoftwareDesignApp.GUI.BlocksNew;
@@ -27,6 +28,11 @@ public partial class AssignmentBlockControl : OneNextBlockControl
         _var1 = var1;
         _var2 = var2;
         InitializeComponent();
+    }
+
+    public override Block ToCoreBlock()
+    {
+        return new AssignmentBlock(BlockId, Var1, Var2, NextBlock?.BlockId);
     }
 
     public override string GetDisplayText()

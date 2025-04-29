@@ -104,7 +104,7 @@ public partial class MainWindow : Window
 
     private void RunCode(object sender, RoutedEventArgs e)
     {
-        throw new NotImplementedException();
+
     }
 
     private void RunTest(object sender, RoutedEventArgs e)
@@ -194,5 +194,20 @@ public partial class MainWindow : Window
 
     private void tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
     {
+    }
+
+    private void TranslateDiagramsToCode(object sender, RoutedEventArgs e)
+    {
+        try
+        {
+            var diagramThread = _tabEditors.Values.Select(x => x.ViewModel.ToDiagramThread()).ToList();
+            var codeGenerator = new CodeGenerator("GeneratedCode");
+            codeGenerator.GenerateCode(diagramThread);
+            MessageBox.Show("успішно створено!");
+        }
+        catch (Exception exception)
+        {
+            MessageBox.Show("Error occured: " + exception.Message);
+        }
     }
 }

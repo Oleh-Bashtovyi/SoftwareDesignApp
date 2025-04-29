@@ -43,6 +43,16 @@
                     FontFamily="Segoe UI"
                     Click="OpenFile"/>
 
+            <Button x:Name="ExitButton" 
+                    Content="Транслція в код" 
+                    Width="120" Height="30" 
+                    Margin="5" 
+                    Background="#3B5998" 
+                    Foreground="White" 
+                    BorderThickness="0" 
+                    FontFamily="Segoe UI"
+                    Click="TranslateDiagramsToCode"/>
+
             <Button x:Name="RunButton" 
                     Content="Запустити" 
                     Width="120" Height="30" 
@@ -84,15 +94,7 @@
                         FontFamily="Segoe UI"
                         Click="DeletePage"/>
 
-                <Button x:Name="ExitButton" 
-                        Content="Вихід" 
-                        Width="120" Height="30" 
-                        Margin="5" 
-                        Background="#3B5998" 
-                        Foreground="White" 
-                        BorderThickness="0" 
-                        FontFamily="Segoe UI"
-                        Click="ExitProgram"/>
+
             </StackPanel>
         </WrapPanel>
 

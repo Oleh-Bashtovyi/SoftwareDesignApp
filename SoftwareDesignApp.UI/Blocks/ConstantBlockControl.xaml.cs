@@ -1,4 +1,5 @@
-﻿using SoftwareDesignApp.UI.Blocks.Base;
+﻿using SoftwareDesignApp.Core;
+using SoftwareDesignApp.UI.Blocks.Base;
 
 namespace SoftwareDesignApp.UI.Blocks;
 
@@ -26,6 +27,11 @@ public partial class ConstantBlockControl : OneNextBlockControl
         _var = var;
         _value = value;
         InitializeComponent();
+    }
+
+    public override Block ToCoreBlock()
+    {
+        return new ConstantBlock(BlockId, Var, Value, NextBlock?.BlockId);
     }
 
     public override string GetDisplayText()

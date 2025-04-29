@@ -1,4 +1,5 @@
-﻿using SoftwareDesignApp.UI.Blocks.Base;
+﻿using SoftwareDesignApp.Core;
+using SoftwareDesignApp.UI.Blocks.Base;
 
 namespace SoftwareDesignApp.UI.Blocks;
 
@@ -9,6 +10,11 @@ public partial class StartBlockControl : OneNextBlockControl
     public StartBlockControl(string blockId) : base(blockId)
     {
         InitializeComponent();
+    }
+
+    public override Block ToCoreBlock()
+    {
+        return new StartBlock(BlockId, NextBlock?.BlockId);
     }
 
     public override string GetDisplayText()
