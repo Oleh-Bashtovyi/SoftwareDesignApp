@@ -63,7 +63,7 @@ namespace SoftwareDesignApp.Core
                         StringBuilder errorMessages = new StringBuilder();
                         foreach (Diagnostic diagnostic in emitResult.Diagnostics.Where(d => d.IsWarningAsError || d.Severity == DiagnosticSeverity.Error))
                         {
-                            errorMessages.AppendLine($"Строка {diagnostic.Location.GetLineSpan().StartLinePosition.Line + 1}: {diagnostic.GetMessage()}");
+                            errorMessages.AppendLine($"Line {diagnostic.Location.GetLineSpan().StartLinePosition.Line + 1}: {diagnostic.GetMessage()}");
                         }
 
                         result.ErrorMessage = errorMessages.ToString();
@@ -150,14 +150,14 @@ namespace SoftwareDesignApp.Core
                     else
                     {
                         result.Success = false;
-                        result.ErrorMessage = "Не найден метод Execute или Main в скомпилированном коде.";
+                        result.ErrorMessage = "No Execute or Main method found in compiled code.";
                     }
                 }
             }
             catch (Exception ex)
             {
                 result.Success = false;
-                result.ErrorMessage = $"Ошибка при компиляции или выполнении: {ex.Message}\n{ex.StackTrace}";
+                result.ErrorMessage = $"Error while compiling or running: {ex.Message}\n{ex.StackTrace}";
             }
 
             return result;

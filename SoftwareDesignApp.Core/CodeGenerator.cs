@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System;
-using System.Text;
+﻿using System.Text;
 
 namespace SoftwareDesignApp.Core;
 
@@ -35,9 +33,9 @@ public class CodeGenerator
         code.AppendLine("    {");
 
         // Оголошення спільних змінних
-        foreach (var variable in sharedVariables)
+        foreach (var kvp in sharedVariables)
         {
-            code.AppendLine($"        private static int {variable} = 0;");
+            code.AppendLine($"        private static int {kvp.Key} = {kvp.Value};");
         }
         code.AppendLine();
 
@@ -121,45 +119,49 @@ public class CodeGenerator
         return code.ToString();
     }
 
-    private HashSet<string> CollectSharedVariables(List<DiagramThread> threads)
+    private Dictionary<string, int> CollectSharedVariables(List<DiagramThread> threads)
     {
-        var variables = new HashSet<string>();
+        var variables = new Dictionary<string, int>();
 
         foreach (var thread in threads)
         {
             foreach (var block in thread.Blocks)
             {
-                // Отримати змінні залежно від типу блоку
                 if (block is AssignmentBlock assignBlock)
                 {
-                    variables.Add(assignBlock.TargetVariable);
+                    if (!variables.ContainsKey(assignBlock.TargetVariable))
+                        variables[assignBlock.TargetVariable] = 0;
 
-                    // Перевірити, чи source не є виразом
                     if (!assignBlock.SourceVariable.Contains(" ") &&
                         !int.TryParse(assignBlock.SourceVariable, out _))
                     {
-                        variables.Add(assignBlock.SourceVariable);
+                        if (!variables.ContainsKey(assignBlock.SourceVariable))
+                            variables[assignBlock.SourceVariable] = 0;
                     }
                 }
                 else if (block is ConstantBlock constBlock)
                 {
-                    variables.Add(constBlock.TargetVariable);
+                    variables[constBlock.TargetVariable] = constBlock.Value;
                 }
                 else if (block is InputBlock inputBlock)
                 {
-                    variables.Add(inputBlock.TargetVariable);
+                    if (!variables.ContainsKey(inputBlock.TargetVariable))
+                        variables[inputBlock.TargetVariable] = 0;
                 }
                 else if (block is PrintBlock printBlock)
                 {
-                    variables.Add(printBlock.SourceVariable);
+                    if (!variables.ContainsKey(printBlock.SourceVariable))
+                        variables[printBlock.SourceVariable] = 0;
                 }
                 else if (block is ConditionBlock condBlock)
                 {
-                    variables.Add(condBlock.Variable);
+                    if (!variables.ContainsKey(condBlock.Variable))
+                        variables[condBlock.Variable] = 0;
                 }
             }
         }
 
         return variables;
     }
+
 }
