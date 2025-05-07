@@ -4,21 +4,14 @@ namespace SoftwareDesignApp.Core;
 
 public class CodeGenerator
 {
-    public CodeGenerator() { }
-
-    public string GenerateCode(List<DiagramThread> threads, Dictionary<string, int>? sharedVariablessss = null)
+    public string GenerateCode(List<DiagramThread> threads, Dictionary<string, int>? CommonVariables = null)
     {
-        foreach (var thread in threads)
-        {
-            thread.ChekStartBlock();
-        }
-
         // Збираємо всі змінні, що використовуються в блоках
         var sharedVariables = CollectSharedVariables(threads);
 
-        if (sharedVariablessss != null)
+        if (CommonVariables != null)
         {
-            foreach (var item in sharedVariablessss)
+            foreach (var item in CommonVariables)
             {
                 sharedVariables[item.Key] = item.Value;
             }
@@ -118,7 +111,6 @@ public class CodeGenerator
         code.AppendLine("            finally");
         code.AppendLine("            {");
         code.AppendLine("                Console.WriteLine(\"Press any key to exit...\");");
-        //code.AppendLine("                Console.ReadKey();");
         code.AppendLine("            }");
         code.AppendLine("        }");
         code.AppendLine("    }");
