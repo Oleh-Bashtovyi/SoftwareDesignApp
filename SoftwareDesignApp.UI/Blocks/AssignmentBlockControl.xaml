@@ -11,7 +11,7 @@
 
     <Canvas>
         <Rectangle Width="200" Height="50"
-                   Fill="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, Mode=OneWay}" Stroke="Black"
+                   Fill="#FAE08F" Stroke="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, Mode=OneWay}"
                    Name="BlockBackground"
                    Tag="{Binding BlockId}" />
 

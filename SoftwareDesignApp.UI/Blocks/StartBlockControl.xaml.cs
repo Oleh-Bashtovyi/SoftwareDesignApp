@@ -12,9 +12,9 @@ public partial class StartBlockControl : OneNextBlockControl
         InitializeComponent();
     }
 
-    public override Block ToCoreBlock()
+    public override Block ToCoreBlock(EndBlockControl endBlock)
     {
-        return new StartBlock(BlockId, NextBlock?.BlockId);
+        return new StartBlock(BlockId, NextBlock?.BlockId ?? endBlock.BlockId);
     }
 
     public override string GetDisplayText()

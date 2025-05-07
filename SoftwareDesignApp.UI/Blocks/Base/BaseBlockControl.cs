@@ -59,7 +59,7 @@ public class BaseBlockControl : UserControl, INotifyPropertyChanged
     {
     }
 
-    public virtual Block ToCoreBlock()
+    public virtual Block ToCoreBlock(EndBlockControl endBlock)
     {
         throw new NotImplementedException("Can not create core block from base block control");
     }

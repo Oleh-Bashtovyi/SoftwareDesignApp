@@ -25,9 +25,9 @@ public partial class InputBlockControl : OneNextBlockControl
         InitializeComponent();
     }
 
-    public override Block ToCoreBlock()
+    public override Block ToCoreBlock(EndBlockControl endBlock)
     {
-        return new InputBlock(BlockId, Var, NextBlock?.BlockId);
+        return new InputBlock(BlockId, Var, NextBlock?.BlockId ?? endBlock.BlockId);
     }
 
     public override string GetDisplayText()

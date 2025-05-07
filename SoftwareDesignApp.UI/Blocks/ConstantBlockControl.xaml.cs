@@ -29,9 +29,9 @@ public partial class ConstantBlockControl : OneNextBlockControl
         InitializeComponent();
     }
 
-    public override Block ToCoreBlock()
+    public override Block ToCoreBlock(EndBlockControl endBlock)
     {
-        return new ConstantBlock(BlockId, Var, Value, NextBlock?.BlockId);
+        return new ConstantBlock(BlockId, Var, Value, NextBlock?.BlockId ?? endBlock.BlockId);
     }
 
     public override string GetDisplayText()

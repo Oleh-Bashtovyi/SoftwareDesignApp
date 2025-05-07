@@ -61,10 +61,15 @@ public partial class ConditionBlockControl : BaseBlockControl
         }
     }
 
-    public override Block ToCoreBlock()
+    public override Block ToCoreBlock(EndBlockControl endBlock)
     {
-        return new ConditionBlock(BlockId, Var, Condition, Value.ToString(), TrueConditionNextBlock?.BlockId,
-            FalseConditionNextBlock.BlockId);
+        return new ConditionBlock(
+            BlockId, 
+            Var, 
+            Condition, 
+            Value.ToString(), 
+            TrueConditionNextBlock?.BlockId ?? endBlock.BlockId,
+            FalseConditionNextBlock?.BlockId ?? endBlock.BlockId);
     }
 
     public override string GetDisplayText()

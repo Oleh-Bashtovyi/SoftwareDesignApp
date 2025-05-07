@@ -12,7 +12,7 @@
 
     <Canvas>
         <Ellipse Width="200" Height="50"
-                 Fill="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, Mode=OneWay}" Stroke="Black"
+                 Fill="#49EC8D" Stroke="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, Mode=OneWay}"
                  Tag="{Binding BlockId}" />
 
         <TextBlock Text="{Binding DiagramText}"

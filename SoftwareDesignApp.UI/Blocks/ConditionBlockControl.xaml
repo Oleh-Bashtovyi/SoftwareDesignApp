@@ -11,7 +11,7 @@
 
     <Canvas>
         <Polygon Points="100,0 200,25 100,50 0,25"
-                 Fill="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, Mode=OneWay}" Stroke="Black"
+                 Fill="#F4B0FF" Stroke="{Binding IsSelected, Converter={StaticResource BoolToColorConverter}, Mode=OneWay}"
                  Tag="{Binding BlockId}" />
         <TextBlock Text="{Binding DiagramText}"
                    TextAlignment="Center"

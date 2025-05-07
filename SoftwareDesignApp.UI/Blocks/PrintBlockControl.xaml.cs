@@ -25,9 +25,9 @@ public partial class PrintBlockControl : OneNextBlockControl
         InitializeComponent();
     }
 
-    public override Block ToCoreBlock()
+    public override Block ToCoreBlock(EndBlockControl endBlock)
     {
-        return new PrintBlock(BlockId, Variable, NextBlock?.BlockId);
+        return new PrintBlock(BlockId, Variable, NextBlock?.BlockId ?? endBlock.BlockId);
     }
 
     public override string GetDisplayText()
