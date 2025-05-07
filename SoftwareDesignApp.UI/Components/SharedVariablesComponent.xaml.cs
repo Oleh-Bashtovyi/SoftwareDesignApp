@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using System.Xml.Linq;
+using SoftwareDesignApp.Core;
 using SoftwareDesignApp.UI.ViewModels;
 using SoftwareDesignApp.UI.Windows;
 
@@ -27,8 +28,23 @@ public partial class SharedVariablesComponent : UserControl
             return;
         }
 
-        var variableValue = Dialogs.ShowInputDialog(parentWindow, $"Введіть початкове значення для {variableName}:",
-            "Додати значення");
+        var validationResult = VariableNameValidation.Validate(variableName);
+        if (!validationResult.IsValid)
+        {
+            var errorMessage = validationResult.ValidationErrorType switch
+            {
+                ValidationErrorType.EmptyName => "Назва змінної не може бути порожньою",
+                ValidationErrorType.InvalidFirstChar => "Назва змінної повинна починатися з літери або символу підкреслення (_)",
+                ValidationErrorType.InvalidChars => "Назва змінної може містити лише літери, цифри та символ підкреслення (_)",
+                ValidationErrorType.ReservedKeyword => "Назва змінної не може бути зарезервованим словом C#",
+                _ => "Невідома помилка при валідації назви змінної"
+            };
+
+            MessageBox.Show(errorMessage);
+            return;
+        }
+
+        var variableValue = Dialogs.ShowInputDialog(parentWindow, $"Введіть початкове значення для {variableName}:", "Додати значення");
         if (string.IsNullOrEmpty(variableValue))
         {
             return;
