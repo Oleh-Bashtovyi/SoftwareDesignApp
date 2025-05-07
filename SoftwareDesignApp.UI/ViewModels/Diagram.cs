@@ -277,7 +277,7 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
             // Встановлюємо зв'язки для блоків з одним виходом
             if (curBlock is OneNextBlockControl oneNextBlock && blockData.ContainsKey("nextBlock"))
             {
-                var nextId = blockData["nextBlock"].ToString();
+                var nextId = blockData["nextBlock"]?.ToString();
                 if (!string.IsNullOrEmpty(nextId) && blockMap.TryGetValue(nextId, out var nextBlock))
                 {
                     oneNextBlock.SetNextBlock(nextBlock);
@@ -301,14 +301,14 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
 
         if (blockData.ContainsKey("trueNextBlock"))
         {
-            var trueBlockId = blockData["trueNextBlock"].ToString();
+            var trueBlockId = blockData["trueNextBlock"]?.ToString();
             if (!string.IsNullOrEmpty(trueBlockId))
                 blockMap.TryGetValue(trueBlockId, out trueNextBlock);
         }
 
         if (blockData.ContainsKey("falseNextBlock"))
         {
-            var falseBlockId = blockData["falseNextBlock"].ToString();
+            var falseBlockId = blockData["falseNextBlock"]?.ToString();
             if (!string.IsNullOrEmpty(falseBlockId))
                 blockMap.TryGetValue(falseBlockId, out falseNextBlock);
         }

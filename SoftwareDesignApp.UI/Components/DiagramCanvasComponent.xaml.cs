@@ -84,8 +84,24 @@ public partial class DiagramCanvasComponent : UserControl
             block.MouseRightButtonDown += OnBlockMouseRightButtonDown;
             MainCanvas.Children.Add(block);
         }
+
+        InitializeBlockIdCounter();
         RedrawConnections();
     }
+
+    private void InitializeBlockIdCounter()
+    {
+        _blockIdCounter = 1;
+
+        foreach (var block in ViewModel.GetBlocks())
+        {
+            if (block.BlockId.StartsWith("Block_") && int.TryParse(block.BlockId.Substring(6), out int blockNumber))
+            {
+                _blockIdCounter = Math.Max(_blockIdCounter, blockNumber + 1);
+            }
+        }
+    }
+
 
     private string GetBlockId()
     {
@@ -171,10 +187,10 @@ public partial class DiagramCanvasComponent : UserControl
     {
         var parentWindow = Window.GetWindow(this);
 
-        var firstAssignVariable = Dialogs.SelectVariableDialog(parentWindow, "Оберіть першу змінну", "Вибір змінної", SharedVariables);
+        var firstAssignVariable = Dialogs.SelectVariableDialog(parentWindow, "Оберіть першу змінну (якій буде присвоєно значення)", "Вибір змінної", SharedVariables);
         if (string.IsNullOrEmpty(firstAssignVariable)) return null;
 
-        var secondAssignVariable = Dialogs.SelectVariableDialog(parentWindow, "Оберіть першу змінну", "Вибір змінної", SharedVariables);
+        var secondAssignVariable = Dialogs.SelectVariableDialog(parentWindow, "Оберіть другу змінну (яке значення присвоїти)", "Вибір змінної", SharedVariables);
         if (string.IsNullOrEmpty(secondAssignVariable)) return null;
 
         return new AssignmentBlockControl(GetBlockId(), firstAssignVariable, secondAssignVariable);
@@ -273,7 +289,7 @@ public partial class DiagramCanvasComponent : UserControl
        {
            new("PLUS (+)", "+"),
            new("MINUS (-)", "-"),
-           new("MULTIPLY (*)", "-"),
+           new("MULTIPLY (*)", "*"),
            new("DIVISION (/)", "/"),
            new("OR", "|"),
            new("AND", "&"),

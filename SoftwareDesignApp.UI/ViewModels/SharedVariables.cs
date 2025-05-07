@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace SoftwareDesignApp.UI.ViewModels;
+
 public class SharedVariables(int maxVariablesCount = 100)
 {
     private readonly Dictionary<string, int> _variables = new();
