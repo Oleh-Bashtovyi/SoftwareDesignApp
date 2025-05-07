@@ -78,7 +78,7 @@ public partial class TestWindow : Window
         AddLog("Starting tests...");
         try
         {
-            var code = File.ReadAllText(_codePath);
+/*            var code = File.ReadAllText(_codePath);
             var testResults = _testManager.RunTests(code, _testCases, _kValue);
             int passedCount = 0;
             int totalVariants = 0;
@@ -94,7 +94,7 @@ public partial class TestWindow : Window
             string summary = $"Test Summary:\n" +
                 $"Passed (OK): {passedCount} / {totalVariants}\n" +
                 $"Coverage for <= {_kValue} steps: {coveragePercent:F2}%";
-            AddLog(summary);
+            AddLog(summary);*/
         }
         catch (Exception ex)
         {

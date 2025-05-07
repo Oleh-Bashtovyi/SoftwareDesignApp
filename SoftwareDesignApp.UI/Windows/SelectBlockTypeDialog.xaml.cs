@@ -35,6 +35,8 @@ public partial class SelectBlockTypeDialog : Window
             new() { Text = "Умова (A == B) або (A < B)", Id = typeof(ConditionBlockControl) },
             new() { Text = "Математичний (A += B) або (A /= B)", Id = typeof(MathOperationBlockControl) },
             new() { Text = "Затримка (DELAY 1000 ms)", Id = typeof(DelayBlockControl) },
+            new() {Text = "Старт", Id = typeof(StartBlockControl)},
+            new() {Text = "Кінець", Id = typeof(EndBlockControl)},
             //new() { Text = "Кінець (End)", Id = typeof(EndBlockControl) }
         ];
 

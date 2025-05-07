@@ -102,7 +102,7 @@
         <TabControl x:Name="tabs" 
                     Grid.Row="1" Grid.Column="0" 
                     Background="White" 
-                    Margin="10" SelectionChanged="tabs_SelectionChanged"/>
+                    Margin="10"/>
 
         <components:SharedVariablesComponent
             x:Name="SharedVariablesComponent"

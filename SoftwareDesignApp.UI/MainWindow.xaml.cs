@@ -8,6 +8,8 @@ using SoftwareDesignApp.UI.Windows;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using SoftwareDesignApp.UI.Enums;
+using SoftwareDesignApp.UI.Exceptions;
 
 namespace SoftwareDesignApp.UI;
 
@@ -21,7 +23,7 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         _sharedVariables = SharedVariablesComponent.ViewModel;
-        _pageCount = 0;
+        _pageCount = 1;
         InitUi();
     }
 
@@ -60,6 +62,13 @@ public partial class MainWindow : Window
         }
     }
 
+    private string GetNextDiagramName()
+    {
+        var name = $"Diagram_{_pageCount}";
+        _pageCount++;
+        return name;
+    }
+
     private void OpenFile(object sender, RoutedEventArgs e)
     {
         OpenFileDialog openDialog = new OpenFileDialog
@@ -71,30 +80,21 @@ public partial class MainWindow : Window
         {
             try
             {
-                string json = File.ReadAllText(openDialog.FileName);
+                var json = File.ReadAllText(openDialog.FileName);
                 var data = JsonConvert.DeserializeObject<Dictionary<string, object>>(json);
-                var diagram = Diagram.LoadFromDict(data, _sharedVariables);
-
-                string diagramName = diagram.Name;
-                string uniqueName = diagramName;
-                int counter = 1;
-
-                while (_tabEditors.ContainsKey(uniqueName))
-                {
-                    uniqueName = $"{diagramName}_{counter}";
-                    counter++;
-                }
+                var diagramName = GetNextDiagramName();
+                var diagram = Diagram.LoadFromDict(diagramName, data, _sharedVariables);
 
                 TabItem newTab = new TabItem
                 {
-                    Header = uniqueName
+                    Header = diagramName
                 };
 
                 var editor = new DiagramCanvasComponent(diagram);
                 newTab.Content = editor;
                 tabs.Items.Add(newTab);
                 tabs.SelectedItem = newTab;
-                _tabEditors[uniqueName] = editor;
+                _tabEditors[diagramName] = editor;
             }
             catch (Exception ex)
             {
@@ -107,7 +107,7 @@ public partial class MainWindow : Window
     {
         try
         {
-            var dialog = new SaveFileDialog
+            var dialog = new OpenFileDialog()
             {
                 Title = "Оберіть файл для запуску коду",
                 DefaultExt = ".cs",
@@ -117,8 +117,8 @@ public partial class MainWindow : Window
             if (dialog.ShowDialog() == true)
             {
                 var compilationService = new CompilationService();
-                string filePath = dialog.FileName;
-                string code = File.ReadAllText(filePath);
+                var filePath = dialog.FileName;
+                var code = File.ReadAllText(filePath);
                 var result = compilationService.CompileAndExecuteFromString(code);
 
                 if (result.Success)
@@ -137,9 +137,6 @@ public partial class MainWindow : Window
             MessageBox.Show("Error occured: " + exception.Message);
         }
     }
-
-
-
 
     private void RunTest(object sender, RoutedEventArgs e)
     {
@@ -164,23 +161,13 @@ public partial class MainWindow : Window
 
     private void NewPage(object sender = null, RoutedEventArgs e = null)
     {
-        _pageCount++;
-        var diagramName = $"Diagram_{_pageCount}";
-        var uniqueName = diagramName;
-        var counter = 1;
-
-        while (_tabEditors.ContainsKey(uniqueName))
-        {
-            uniqueName = $"{diagramName}_{counter}";
-            counter++;
-        }
-
+        var diagramName = GetNextDiagramName();
         var newTab = new TabItem
         {
-            Header = uniqueName
+            Header = diagramName
         };
 
-        var diagramViewModel = new Diagram(uniqueName, _sharedVariables);
+        var diagramViewModel = new Diagram(diagramName, _sharedVariables);
         var editor = new DiagramCanvasComponent(diagramViewModel);
 
         // Додавання початкового блоку
@@ -197,7 +184,7 @@ public partial class MainWindow : Window
         tabs.Items.Add(newTab);
         tabs.SelectedItem = newTab;
 
-        _tabEditors[uniqueName] = editor;
+        _tabEditors[diagramName] = editor;
     }
 
     private void DeletePage(object sender, RoutedEventArgs e)
@@ -227,10 +214,6 @@ public partial class MainWindow : Window
         }
     }
 
-    private void tabs_SelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-    }
-
     private void TranslateDiagramsToCode(object sender, RoutedEventArgs e)
     {
         try
@@ -245,20 +228,34 @@ public partial class MainWindow : Window
 
             if (dialog.ShowDialog() == true)
             {
-                string filePath = dialog.FileName;
-
-
+                var filePath = dialog.FileName;
                 var diagramThread = _tabEditors.Values.Select(x => x.ViewModel.ToDiagramThread()).ToList();
                 var codeGenerator = new CodeGenerator();
-                var code = codeGenerator.GenerateCode(diagramThread, _sharedVariables.GetVariables().ToDictionary()); 
+                var code = codeGenerator.GenerateCode(diagramThread, _sharedVariables.GetVariables().ToDictionary());
                 File.WriteAllText(filePath, code);
                 MessageBox.Show("успішно трансльовано!");
 
             }
         }
-        catch (Exception exception)
+        catch (DiagramException ex)
         {
-            MessageBox.Show("Error occured: " + exception.Message);
+            MessageBox.Show($"Помилка під час трансляції діаграми {ex.DiagramName}: {DiagramErrorCodeToMessage(ex.ErrorCode)}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
+        catch (Exception)
+        {
+            MessageBox.Show("Сталась помилка під час трансляції коду!", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
+        }
+    }
+
+    private string DiagramErrorCodeToMessage(DiagramErrorCode code)
+    {
+        return code switch
+        {
+            DiagramErrorCode.NoStartBlock => "Відсутній блок старту.",
+            DiagramErrorCode.NoEndBlock => "Відсутній блок кінця.",
+            DiagramErrorCode.MoreThanOneStartBlock => "Більше ніж один блок старту.",
+            DiagramErrorCode.MoreThanOneEndBlock => "Більше ніж один блок кінця.",
+            _ => throw new ArgumentOutOfRangeException(nameof(code), code, null)
+        };
     }
 }

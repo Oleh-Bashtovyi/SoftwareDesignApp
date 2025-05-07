@@ -8,7 +8,8 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Shapes;
-using SoftwareDesignApp.Core;
+using SoftwareDesignApp.UI.Exceptions;
+using SoftwareDesignApp.UI.Enums;
 
 namespace SoftwareDesignApp.UI.Components;
 
@@ -139,6 +140,14 @@ public partial class DiagramCanvasComponent : UserControl
             {
                 block = new EndBlockControl(GetBlockId());
             }
+            else if (blockType == typeof(StartBlockControl))
+            {
+                block = new StartBlockControl(GetBlockId());
+            }
+            else if (blockType == typeof(OneNextBlockControl))
+            {
+                block = new OneNextBlockControl(GetBlockId());
+            }
             else
             {
                 MessageBox.Show("Невірний тип блоку.", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
@@ -148,6 +157,10 @@ public partial class DiagramCanvasComponent : UserControl
                 return;
 
             AddBlock(block, position);
+        }
+        catch (DiagramException ex)
+        {
+            MessageBox.Show($"Помилка при створенні блоку: {DiagramErrorCodeToMessage(ex.ErrorCode)}", "Помилка", MessageBoxButton.OK, MessageBoxImage.Error);
         }
         catch (Exception)
         {
@@ -272,7 +285,14 @@ public partial class DiagramCanvasComponent : UserControl
 
         return new MathOperationBlockControl(GetBlockId(), firstVariable, operation, secondVariable);
     }
-
+    private StartBlockControl CreateStartBlock()
+    {
+        return new StartBlockControl(GetBlockId());
+    }
+    private EndBlockControl CreateEndBlock()
+    {
+        return new EndBlockControl(GetBlockId());
+    }
 
     public void AddBlock(BaseBlockControl block, Point point) => AddBlock(block, point.X, point.Y);
     public void AddBlock(BaseBlockControl block, double x = 0, double y = 0)
@@ -532,5 +552,17 @@ public partial class DiagramCanvasComponent : UserControl
         arrow.Fill = Brushes.Black;
 
         MainCanvas.Children.Add(arrow);
+    }
+
+    private string DiagramErrorCodeToMessage(DiagramErrorCode code)
+    {
+        return code switch
+        {
+            DiagramErrorCode.NoStartBlock => "Відсутній блок старту.",
+            DiagramErrorCode.NoEndBlock => "Відсутній блок кінця.",
+            DiagramErrorCode.MoreThanOneStartBlock => "Більше ніж один блок старту заборонено.",
+            DiagramErrorCode.MoreThanOneEndBlock => "Більше ніж один блок кінця забороненно.",
+            _ => throw new ArgumentOutOfRangeException(nameof(code), code, null)
+        };
     }
 }

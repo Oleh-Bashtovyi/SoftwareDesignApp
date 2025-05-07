@@ -50,5 +50,11 @@ public class SharedVariables(int maxVariablesCount = 100)
         return true;
     }
 
+    public void Clear()
+    {
+        _variables.Clear();
+        VariablesCollection.Clear();
+    }
+
     public IReadOnlyDictionary<string, int> GetVariables() => _variables;
 }
