@@ -1,14 +1,13 @@
-﻿using System.IO;
-using SoftwareDesignApp.UI.Blocks;
-using SoftwareDesignApp.UI.ViewModels;
-using System.Windows;
-using System.Windows.Controls;
-using Microsoft.Win32;
+﻿using Microsoft.Win32;
 using Newtonsoft.Json;
 using SoftwareDesignApp.Core;
+using SoftwareDesignApp.UI.Blocks;
 using SoftwareDesignApp.UI.Components;
+using SoftwareDesignApp.UI.ViewModels;
 using SoftwareDesignApp.UI.Windows;
-using Formatting = System.Xml.Formatting;
+using System.IO;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace SoftwareDesignApp.UI;
 

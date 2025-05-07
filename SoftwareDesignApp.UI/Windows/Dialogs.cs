@@ -50,6 +50,11 @@ public static class Dialogs
         genericDialog.Owner = parent;
         genericDialog.ShowDialog();
 
+        if (genericDialog.DialogResult != true)
+            return null;
+
         return genericDialog.SelectedItem?.Id as T;
     }
+
+
 }

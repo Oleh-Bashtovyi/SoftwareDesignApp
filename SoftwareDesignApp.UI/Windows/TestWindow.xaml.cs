@@ -1,24 +1,29 @@
 ﻿using Microsoft.Win32;
+using SoftwareDesignApp.Core;
 using System.IO;
 using System.Text.Json;
 using System.Windows;
-using SoftwareDesignApp.Core;
 
 namespace SoftwareDesignApp.UI.Windows;
 
+public class LogEntry(DateTime timeStamp, string message)
+{
+    public DateTime Timestamp { get; } = timeStamp;
+    public string Message { get; } = message;
+}
+
+
 public partial class TestWindow : Window
 {
-    private TestManager testManager;
-    private string codePath;
-    private string testPath;
-    private int kValue = 10; // значення K (за замовчуванням)
-    private List<TestCase> testCases = new List<TestCase>();
-    private List<LogEntry> logs = new List<LogEntry>();
+    private readonly TestManager _testManager = new();
+    private int _kValue = 10; 
+    private string? _codePath;
+    private List<TestCase> _testCases = [];
+    private List<LogEntry> _logs = [];
 
     public TestWindow()
     {
         InitializeComponent();
-        testManager = new TestManager(); 
     }
 
     private void LoadTests_Click(object sender, RoutedEventArgs e)
@@ -27,18 +32,20 @@ public partial class TestWindow : Window
         {
             OpenFileDialog openFileDialog = new OpenFileDialog
             {
-                Title = "Select JSON test file",
                 InitialDirectory = Directory.GetCurrentDirectory(),
+                Title = "Select JSON test file",
                 Filter = "JSON files (*.json)|*.json|All files (*.*)|*.*"
             };
 
             if (openFileDialog.ShowDialog() == true)
             {
-                string filePath = openFileDialog.FileName;
+                var filePath = openFileDialog.FileName;
                 var content = File.ReadAllText(filePath);
-                testCases = JsonSerializer.Deserialize<List<TestCase>>(content);
-                if (testCases != null)
+                var loadedTestCases = JsonSerializer.Deserialize<List<TestCase>>(content);
+
+                if (loadedTestCases != null)
                 {
+                    _testCases = loadedTestCases;
                     AddLog($"Loaded tests from: {filePath}");
                     StatusLabel.Content = $"Tests loaded: {Path.GetFileName(filePath)}";
                 }
@@ -55,15 +62,14 @@ public partial class TestWindow : Window
     }
 
 
-
     private void RunTests_Click(object sender, RoutedEventArgs e)
     {
-        if (!testCases.Any())
+        if (!_testCases.Any())
         {
             AddLog("No tests loaded. Please load tests first.");
             return;
         }
-        if (string.IsNullOrEmpty(codePath))
+        if (string.IsNullOrEmpty(_codePath))
         {
             AddLog("No code file loaded. Please load a code file to test.");
             return;
@@ -72,8 +78,8 @@ public partial class TestWindow : Window
         AddLog("Starting tests...");
         try
         {
-            var code = File.ReadAllText(codePath);
-            var testResults = testManager.RunTests(code, testCases, kValue);
+            var code = File.ReadAllText(_codePath);
+            var testResults = _testManager.RunTests(code, _testCases, _kValue);
             int passedCount = 0;
             int totalVariants = 0;
 
@@ -87,7 +93,7 @@ public partial class TestWindow : Window
 
             string summary = $"Test Summary:\n" +
                 $"Passed (OK): {passedCount} / {totalVariants}\n" +
-                $"Coverage for <= {kValue} steps: {coveragePercent:F2}%";
+                $"Coverage for <= {_kValue} steps: {coveragePercent:F2}%";
             AddLog(summary);
         }
         catch (Exception ex)
@@ -108,9 +114,9 @@ public partial class TestWindow : Window
 
         if (openFileDialog.ShowDialog() == true)
         {
-            codePath = openFileDialog.FileName;
-            AddLog($"Loaded code file: {codePath}");
-            StatusLabel.Content = $"Code loaded: {Path.GetFileName(codePath)}";
+            _codePath = openFileDialog.FileName;
+            AddLog($"Loaded code file: {_codePath}");
+            StatusLabel.Content = $"Code loaded: {Path.GetFileName(_codePath)}";
         }
     }
 
@@ -127,8 +133,8 @@ public partial class TestWindow : Window
             int value = int.Parse(inputValue);
             if (value is >= 1 and <= 20)
             {
-                kValue = value;
-                AddLog($"Set K to {kValue}");
+                _kValue = value;
+                AddLog($"Set K to {_kValue}");
             }
             else
             {
@@ -156,7 +162,7 @@ public partial class TestWindow : Window
             try
             {
                 string filePath = saveFileDialog.FileName;
-                string json = JsonSerializer.Serialize(logs, new JsonSerializerOptions { WriteIndented = true });
+                string json = JsonSerializer.Serialize(_logs, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(filePath, json);
                 AddLog($"Logs saved to {filePath}");
             }
@@ -182,11 +188,11 @@ public partial class TestWindow : Window
             {
                 string filePath = openFileDialog.FileName;
                 string jsonContent = File.ReadAllText(filePath);
-                logs = JsonSerializer.Deserialize<List<LogEntry>>(jsonContent);
+                _logs = JsonSerializer.Deserialize<List<LogEntry>>(jsonContent);
 
                 // Очищаємо поточний лог і відображаємо завантажені записи
                 LogTextBox.Text = "";
-                foreach (var entry in logs)
+                foreach (var entry in _logs)
                 {
                     LogTextBox.AppendText($"[{entry.Timestamp}] {entry.Message}\n");
                 }
@@ -202,136 +208,11 @@ public partial class TestWindow : Window
 
     private void AddLog(string message)
     {
-        string timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
-        LogEntry logEntry = new LogEntry
-        {
-            Timestamp = timestamp,
-            Message = message
-        };
+        var timeStamp = DateTime.Now;
+        var logEntry = new LogEntry(timeStamp, message);
+        _logs.Add(logEntry);
 
-        logs.Add(logEntry);
-        LogTextBox.AppendText($"[{timestamp}] {message}\n");
+        LogTextBox.AppendText($"[{timeStamp:yyyy-MM-dd HH:mm:ss}] {message}\n");
         LogTextBox.ScrollToEnd();
     }
 }
-
-public class LogEntry
-{
-    public string Timestamp { get; set; }
-    public string Message { get; set; }
-}
-
-
-public class TestCase
-{
-    public string ExpectedResult { get; set; }
-}
-
-public class TestCaseResult
-{
-    public string Code { get; set; }
-    public string ExpectedResult { get; set; }
-    public int Attempts { get; set; }
-    public int SuccessCount { get; set; }
-    public double CoveragePercent => SuccessCount / (double)Attempts * 100;
-}
-
-
-public class TestManager
-{
-    public List<TestCaseResult> RunTests(string code, List<TestCase> testCases, int attempts)
-    {
-        var results = new List<TestCaseResult>();
-
-        foreach (var testCase in testCases)
-        {
-            var testCaseResult = new TestCaseResult();
-            var expectedValue = testCase.ExpectedResult.Replace("\r", "");
-            var codeCompiler = new CompilationService();
-
-            for (int i = 0; i < attempts; i++)
-            {
-                var compiledCode = codeCompiler.CompileAndExecuteFromString(code);
-                var rawOutput = compiledCode.Output.Replace("\r", "").Trim();
-                var lines = rawOutput.Split('\n');
-
-                string cleanedOutput = rawOutput;
-                if (lines.Length >= 3)
-                {
-                    cleanedOutput = string.Join("\n", lines.Skip(1).Where(x => !string.IsNullOrWhiteSpace(x)).Take(lines.Length - 3));
-                }
-
-                if (cleanedOutput == expectedValue)
-                {
-                    testCaseResult.SuccessCount++;
-                }
-
-                testCaseResult.Attempts++;
-            }
-            testCaseResult.Code = code;
-            testCaseResult.ExpectedResult = expectedValue;
-            results.Add(testCaseResult);
-        }
-
-        return results;
-    }
-}
-
-
-
-
-/*public class TestManager
-{
-    public List<string> FindExistingTests()
-    {
-        // Тут має бути реалізація пошуку тестів
-        return new List<string>();
-    }
-
-    public void LoadTestsFromJson(string filePath)
-    {
-        // Тут має бути реалізація завантаження тестів з JSON
-    }
-
-    public bool TestsLoaded()
-    {
-        // Заглушка - перевірка, чи завантажено тести
-        return false;
-    }
-
-    public object GetTests()
-    {
-        // Заглушка - повертає завантажені тести
-        return new object();
-    }
-}
-
-public class Tester
-{
-    public TestResult RunTests(string codePath, object tests, int kValue)
-    {
-        // Заглушка - тут має бути виконання тестів
-        return new TestResult();
-    }
-}
-
-public class TestResult
-{
-    public List<TestData> TestData { get; set; } = new List<TestData>();
-    public double CoveragePercent { get; set; }
-}
-
-public class TestData
-{
-    public int VariantsExecuted { get; set; }
-    public int CorrectVariants { get; set; }
-    public double CoveragePercent { get; set; }
-    public List<VariantInfo> Log { get; set; } = new List<VariantInfo>();
-}
-
-public class VariantInfo
-{
-    public int Variant { get; set; }
-    public string Status { get; set; }
-    public string Output { get; set; }
-}*/

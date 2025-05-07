@@ -33,7 +33,9 @@ public partial class SelectBlockTypeDialog : Window
             new() { Text = "Введення (INPUT A)", Id = typeof(InputBlockControl) },
             new() { Text = "Вивід (PRINT A)", Id = typeof(PrintBlockControl) },
             new() { Text = "Умова (A == B) або (A < B)", Id = typeof(ConditionBlockControl) },
-            new() { Text = "Кінець (End)", Id = typeof(EndBlockControl) }
+            new() { Text = "Математичний (A += B) або (A /= B)", Id = typeof(MathOperationBlockControl) },
+            new() { Text = "Затримка (DELAY 1000 ms)", Id = typeof(DelayBlockControl) },
+            //new() { Text = "Кінець (End)", Id = typeof(EndBlockControl) }
         ];
 
         SelectedItem = BlockTypes[0];

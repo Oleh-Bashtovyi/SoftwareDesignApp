@@ -10,10 +10,10 @@ public class BoolToBlockColorConverter : IValueConverter
     {
         if (value is bool boolValue)
         {
-            return boolValue ? new SolidColorBrush(Colors.LightGray) : new SolidColorBrush(Colors.White);
+            return boolValue ? new SolidColorBrush(Colors.Gray) : new SolidColorBrush(Colors.Black);
         }
 
-        return new SolidColorBrush(Colors.White);
+        return new SolidColorBrush(Colors.Black);
     }
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture)

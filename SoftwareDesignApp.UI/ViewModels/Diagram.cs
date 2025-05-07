@@ -41,8 +41,15 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
     public DiagramThread ToDiagramThread()
     {
         var diagramThread = new DiagramThread(Name);
-        diagramThread.Blocks = _blocks.Select(x => x.ToCoreBlock()).ToList();
-        diagramThread.StartBlock = _blocks.First(x => x is StartBlockControl).ToCoreBlock();
+        var endBlock = _blocks.OfType<EndBlockControl>().FirstOrDefault();
+
+        if (endBlock == null)
+        {
+            throw new InvalidOperationException("End block not found.");
+        }
+
+        diagramThread.Blocks = _blocks.Select(x => x.ToCoreBlock(endBlock)).ToList();
+        diagramThread.StartBlock = _blocks.First(x => x is StartBlockControl).ToCoreBlock(endBlock);
         return diagramThread;
     }
 
@@ -90,6 +97,16 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
                 blockData["var"] = conditionBlock.Var;
                 blockData["value"] = conditionBlock.Value;
                 blockData["condition"] = conditionBlock.Condition;
+            }
+            else if (block is DelayBlockControl delayBlock)
+            {
+                blockData["delay"] = delayBlock.DelayMs;
+            }
+            else if (block is MathOperationBlockControl mathOperationBlock)
+            {
+                blockData["var1"] = mathOperationBlock.TargetVariable;
+                blockData["var2"] = mathOperationBlock.OperationVariable;
+                blockData["operation"] = mathOperationBlock.Operation;
             }
 
             if (block is OneNextBlockControl oneNextBlockControl && oneNextBlockControl.NextBlock != null)
@@ -207,6 +224,16 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
                                                          Convert.ToInt32(blockData["value"]),
                                                          blockData["condition"].ToString());
                         break;
+                    case nameof(DelayBlockControl):
+                        block = new DelayBlockControl(blockData["id"].ToString(),
+                                                       Convert.ToInt32(blockData["delay"]));
+                        break;
+                    case nameof(MathOperationBlockControl):
+                        block = new MathOperationBlockControl(blockData["id"].ToString(),
+                                                              blockData["var1"].ToString(),
+                                                              blockData["operation"].ToString(),
+                                                              blockData["var2"].ToString());
+                        break;
                 }
 
                 if (block != null)
@@ -232,6 +259,7 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
                         if (!string.IsNullOrEmpty(nextId) && blockMap.TryGetValue(nextId, out var nextBlock))
                         {
                             oneNextBlockControl.SetNextBlock(nextBlock);
+                            nextBlock?.AddIncomingBlock(oneNextBlockControl);
                         }
                     }
 
@@ -259,6 +287,8 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
                         }
 
                         conditionBlockControl.SetNextBlocks(trueNextBlock, falseNextBlock);
+                        trueNextBlock?.AddIncomingBlock(conditionBlockControl);
+                        falseNextBlock?.AddIncomingBlock(conditionBlockControl);
                     }
                 }
             }
