@@ -4,8 +4,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:SoftwareDesignApp.UI.Windows"
+        xmlns:converters="clr-namespace:SoftwareDesignApp.UI.Converters"
         mc:Ignorable="d"
-       Title="Test Runner and Logs" Height="650" Width="850"
+        Title="Test Runner and Logs" Height="600" Width="1200"
         Background="#1E1E1E" Opacity="0.95">
     <Window.Resources>
         <Style TargetType="Button">
@@ -39,7 +40,7 @@
             <Setter Property="BorderBrush" Value="#3E3E42"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="10"/>
-            <Setter Property="FontFamily" Value="Segoe UI"/>
+            <Setter Property="FontFamily" Value="Consolas"/>
             <Setter Property="FontSize" Value="14"/>
         </Style>
 
@@ -55,6 +56,38 @@
             <Setter Property="BorderBrush" Value="#3E3E42"/>
             <Setter Property="BorderThickness" Value="1"/>
         </Style>
+
+        <converters:TextTrimConverter x:Key="TextTrimConverter"/>
+
+        <!-- Data templates for displaying log entries and test cases -->
+        <DataTemplate x:Key="LogTemplate">
+            <Border Margin="0,5,0,5" Padding="10" Background="#2D2D30">
+                <StackPanel>
+                    <TextBlock Text="{Binding Timestamp, StringFormat={}{0:yyyy-MM-dd HH:mm:ss}}" 
+                               Foreground="#CCCCCC" 
+                               FontWeight="Bold" 
+                               Margin="0,0,0,5"/>
+                    <TextBlock Text="{Binding Message, Converter={StaticResource TextTrimConverter}, ConverterParameter=200}" 
+                               Foreground="White" 
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
+        <DataTemplate x:Key="TestCaseTemplate">
+            <Border Margin="0,5,0,5" Padding="10" Background="#2D2D30">
+                <StackPanel>
+                    <TextBlock Text="{Binding TestCaseName}" 
+                               Foreground="#CCCCCC" 
+                               FontWeight="Bold" 
+                               Margin="0,0,0,5"/>
+                    <TextBlock Text="{Binding ExpectedResult, Converter={StaticResource TextTrimConverter}, ConverterParameter=150}" 
+                               Foreground="White" 
+                               TextWrapping="Wrap"/>
+                </StackPanel>
+            </Border>
+        </DataTemplate>
+
     </Window.Resources>
 
     <Grid Margin="15">
@@ -64,7 +97,7 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!-- Рамка для кнопок керування -->
+        <!-- Control buttons -->
         <Border Grid.Row="0" Padding="5">
             <StackPanel Orientation="Horizontal">
                 <Button Content="Load Tests" Click="LoadTests_Click"/>
@@ -73,19 +106,81 @@
                 <Button Content="Run Tests" Click="RunTests_Click"/>
                 <Button Content="Save Logs" Click="SaveLogs_Click"/>
                 <Button Content="Load Logs" Click="LoadLogs_Click"/>
+                <Button Content="Clear Logs" Click="ClearLogs_Click"/>
             </StackPanel>
         </Border>
 
-        <!-- Рамка для статусу -->
+        <!-- Status panel -->
         <Border Grid.Row="1" Margin="0,10,0,10" Padding="10">
             <Label x:Name="StatusLabel" Content="No tests or code loaded."/>
         </Border>
 
-        <!-- Рамка для логування -->
-        <Border Grid.Row="2" Padding="10">
-            <ScrollViewer VerticalScrollBarVisibility="Auto">
-                <TextBox x:Name="LogTextBox" TextWrapping="Wrap" IsReadOnly="True"/>
-            </ScrollViewer>
-        </Border>
+        <!-- Main content area - split into two columns -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Left column - Code and Test Cases -->
+            <Grid Grid.Column="0" Margin="0,0,5,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Code display -->
+                <Border Grid.Row="0" Padding="5" Margin="0,0,0,5">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Row="0" Content="Code Preview" FontWeight="Bold"/>
+                        <ScrollViewer Grid.Row="1" 
+                                      VerticalScrollBarVisibility="Auto" 
+                                      HorizontalScrollBarVisibility="Auto">
+                            <TextBlock Text="{Binding TestableCode, Converter={StaticResource TextTrimConverter}, ConverterParameter=10000}" 
+                                       TextWrapping="NoWrap" 
+                                       Foreground="White" 
+                                       FontFamily="Consolas"/>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+
+                <!-- Test cases display -->
+                <Border Grid.Row="1" Padding="5" Margin="0,5,0,0">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+
+                        <Label Grid.Row="0" Content="Test Cases" FontWeight="Bold"/>
+                        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                            <ItemsControl ItemsSource="{Binding TestCases}" 
+                                          ItemTemplate="{StaticResource TestCaseTemplate}"/>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Grid>
+
+            <!-- Right column - Logs -->
+            <Border Grid.Column="1" Padding="5" Margin="5,0,0,0">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Label Grid.Row="0" Content="Logs" FontWeight="Bold"/>
+                    <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                        <ItemsControl ItemsSource="{Binding Logs}" 
+                                      ItemTemplate="{StaticResource LogTemplate}"/>
+                    </ScrollViewer>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </Window>

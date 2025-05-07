@@ -158,6 +158,14 @@ public class CodeGenerator
                     if (!variables.ContainsKey(condBlock.Variable))
                         variables[condBlock.Variable] = 0;
                 }
+                else if (block is MathOperationBlock mathOperationBlock)
+                {
+                    if (!variables.ContainsKey(mathOperationBlock.TargetVariable))
+                        variables[mathOperationBlock.TargetVariable] = 0;
+
+                    if(!variables.ContainsKey(mathOperationBlock.OtherVariable))
+                        variables[mathOperationBlock.OtherVariable] = 0;
+                }
             }
         }
 

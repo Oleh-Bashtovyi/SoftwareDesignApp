@@ -1,0 +1,26 @@
+[
+  {
+    "Message": "Loaded tests from: C:\\work\\course_32\\\u043A\u043E\u043D\u0441\u0442\u0440\u0443\u044E\u0432\u0430\u043D\u043D\u044F\\Lab\\TempForData\\TESTING\\TestCases_1.json",
+    "Timestamp": "2025-05-07T22:31:08.5567822+03:00"
+  },
+  {
+    "Message": "Loaded code file: C:\\work\\course_32\\\u043A\u043E\u043D\u0441\u0442\u0440\u0443\u044E\u0432\u0430\u043D\u043D\u044F\\Lab\\TempForData\\TESTING\\TranslatedResult_1.cs",
+    "Timestamp": "2025-05-07T22:31:13.1699028+03:00"
+  },
+  {
+    "Message": "Set K to 10",
+    "Timestamp": "2025-05-07T22:31:22.1051354+03:00"
+  },
+  {
+    "Message": "Starting tests...",
+    "Timestamp": "2025-05-07T22:31:26.2120517+03:00"
+  },
+  {
+    "Message": "Unique outputs: 1\nTotal test cases: 1\nNumber of successful test cases: 1\nTest cases success rate: 1/1 (100%)",
+    "Timestamp": "2025-05-07T22:31:28.376253+03:00"
+  },
+  {
+    "Message": "TEST CASE 1\nAttempts count: 10\nSuccess count: 10\nSuccess rate: 100/10 (100%)\nEXPECTED RESULT:\nStarting Diagram_1...\nV1 = 3\nV2 = 12\nV2 = 48\nV1 = 48",
+    "Timestamp": "2025-05-07T22:31:28.3765705+03:00"
+  }
+]

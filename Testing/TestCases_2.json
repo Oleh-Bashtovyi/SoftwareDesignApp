@@ -1,0 +1,9 @@
+[
+  {
+    "ExpectedResult": "Starting Diagram_1...\nStarting Diagram_2...\nV1 = 3\nV2 = 12\nV2 = 48\nV1 = 48\nV2 = 48"
+
+  },
+  {
+    "ExpectedResult": "Starting Diagram_1...\nStarting Diagram_2...\n_777_ = 777\nV1 = 20\nV2 = 80\nV1 = 80"
+  }
+]

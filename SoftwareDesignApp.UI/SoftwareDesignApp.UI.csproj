@@ -16,4 +16,8 @@
     <ProjectReference Include="..\SoftwareDesignApp.Core\SoftwareDesignApp.Core.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Exceptions\" />
+  </ItemGroup>
+
 </Project>

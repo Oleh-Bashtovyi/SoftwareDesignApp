@@ -1,0 +1,53 @@
+{
+  "blocks": [
+    {
+      "id": "Start",
+      "type": "StartBlockControl",
+      "x": 250.0,
+      "y": 50.0,
+      "nextBlock": "Block_1"
+    },
+    {
+      "id": "End",
+      "type": "EndBlockControl",
+      "x": 214.8,
+      "y": 479.9999999999998
+    },
+    {
+      "id": "Block_1",
+      "type": "ConditionBlockControl",
+      "x": 236.59999999999997,
+      "y": 152.2400000000001,
+      "var": "V1",
+      "value": 30,
+      "condition": ">",
+      "trueNextBlock": "Block_2",
+      "falseNextBlock": "Block_3"
+    },
+    {
+      "id": "Block_2",
+      "type": "PrintBlockControl",
+      "x": 224.59999999999997,
+      "y": 277.0400000000001,
+      "var": "V2",
+      "nextBlock": "End"
+    },
+    {
+      "id": "Block_3",
+      "type": "ConstantBlockControl",
+      "x": 496.60000000000014,
+      "y": 282.64000000000004,
+      "var": "V1",
+      "value": 20,
+      "nextBlock": "Block_4"
+    },
+    {
+      "id": "Block_4",
+      "type": "PrintBlockControl",
+      "x": 498.20000000000005,
+      "y": 373.84,
+      "var": "_777_",
+      "nextBlock": "End"
+    }
+  ]
+}

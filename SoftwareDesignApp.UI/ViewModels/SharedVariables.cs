@@ -1,6 +1,7 @@
 ﻿using System.Collections.ObjectModel;
 
 namespace SoftwareDesignApp.UI.ViewModels;
+
 public class SharedVariables(int maxVariablesCount = 100)
 {
     private readonly Dictionary<string, int> _variables = new();
@@ -48,6 +49,12 @@ public class SharedVariables(int maxVariablesCount = 100)
             item.Value = newValue;
 
         return true;
+    }
+
+    public void Clear()
+    {
+        _variables.Clear();
+        VariablesCollection.Clear();
     }
 
     public IReadOnlyDictionary<string, int> GetVariables() => _variables;

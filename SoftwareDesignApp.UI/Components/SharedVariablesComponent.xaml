@@ -7,9 +7,10 @@
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
     <StackPanel Grid.Row="1" Grid.Column="1" 
+                
                     Background="#2D2D2D" 
                     Margin="10">
-        <Label Content="Спільні змінні:" 
+        <Label Content="Ініціалізовані змінні:" 
                    Foreground="White" 
                    FontSize="12" 
                    FontFamily="Segoe UI"/>
@@ -35,6 +36,34 @@
             <Grid.ColumnDefinitions>
                 <ColumnDefinition/>
                 <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+
+            <Button x:Name="SaveVarButton" 
+                    Grid.Column="0" 
+                    Content="Зберегти" 
+                    Margin="5" 
+                    Background="#5D4777" 
+                    Foreground="White" 
+                    BorderThickness="0" 
+                    FontFamily="Segoe UI"
+                    Click="SaveVariables"/>
+
+            <Button x:Name="LoadVarButton" 
+                    Grid.Column="1" 
+                    Content="Завантажити" 
+                    Margin="5" 
+                    Background="#5D4777" 
+                    Foreground="White" 
+                    BorderThickness="0" 
+                    FontFamily="Segoe UI"
+                    Click="LoadVariables"/>
+        </Grid>
+
+
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition/>
+                <ColumnDefinition/>
                 <ColumnDefinition/>
             </Grid.ColumnDefinitions>
 
@@ -42,7 +71,7 @@
                         Grid.Column="0" 
                         Content="Додати" 
                         Margin="5" 
-                        Background="#3B5998" 
+                        Background="#5D4777" 
                         Foreground="White" 
                         BorderThickness="0" 
                         FontFamily="Segoe UI"
@@ -52,7 +81,7 @@
                         Grid.Column="1" 
                         Content="Редагувати" 
                         Margin="5" 
-                        Background="#3B5998" 
+                        Background="#5D4777" 
                         Foreground="White" 
                         BorderThickness="0" 
                         FontFamily="Segoe UI"
@@ -62,7 +91,7 @@
                         Grid.Column="2" 
                         Content="Видалити" 
                         Margin="5" 
-                        Background="#3B5998" 
+                        Background="#5D4777" 
                         Foreground="White" 
                         BorderThickness="0" 
                         FontFamily="Segoe UI"

@@ -12,7 +12,7 @@ public partial class EndBlockControl : BaseBlockControl
         InitializeComponent();
     }
 
-    public override Block ToCoreBlock()
+    public override Block ToCoreBlock(EndBlockControl endBlock)
     {
         return new EndBlock(BlockId);
     }

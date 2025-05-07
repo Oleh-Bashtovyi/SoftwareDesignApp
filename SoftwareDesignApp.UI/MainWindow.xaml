@@ -24,50 +24,50 @@
         <WrapPanel Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" 
                    Background="#2D2D2D" Margin="10">
             <Button x:Name="SaveButton" 
-                    Content="Зберегти" 
+                    Content="Зберегти діаграму" 
                     Width="120" Height="30" 
                     Margin="5" 
-                    Background="#3B5998" 
+                    Background="#5D4777" 
                     Foreground="White" 
                     BorderThickness="0" 
                     FontFamily="Segoe UI"
                     Click="Save"/>
 
             <Button x:Name="OpenButton" 
-                    Content="Відкрити" 
+                    Content="Відкрити діаграму" 
                     Width="120" Height="30" 
                     Margin="5" 
-                    Background="#3B5998" 
+                    Background="#5D4777" 
                     Foreground="White" 
                     BorderThickness="0" 
                     FontFamily="Segoe UI"
                     Click="OpenFile"/>
 
             <Button x:Name="ExitButton" 
-                    Content="Транслція в код" 
+                    Content="Транслція" 
                     Width="120" Height="30" 
                     Margin="5" 
-                    Background="#3B5998" 
+                    Background="#5D4777" 
                     Foreground="White" 
                     BorderThickness="0" 
                     FontFamily="Segoe UI"
                     Click="TranslateDiagramsToCode"/>
 
             <Button x:Name="RunButton" 
-                    Content="Запустити" 
+                    Content="Компіляція" 
                     Width="120" Height="30" 
                     Margin="5" 
-                    Background="#3B5998" 
+                    Background="#5D4777" 
                     Foreground="White" 
                     BorderThickness="0" 
                     FontFamily="Segoe UI"
                     Click="RunCode"/>
 
             <Button x:Name="TestButton" 
-                    Content="Test" 
+                    Content="Тестування" 
                     Width="120" Height="30" 
                     Margin="5" 
-                    Background="#3B5998" 
+                    Background="#5D4777" 
                     Foreground="White" 
                     BorderThickness="0" 
                     FontFamily="Segoe UI"
@@ -78,7 +78,7 @@
                         Content="Нова сторінка" 
                         Width="120" Height="30" 
                         Margin="5" 
-                        Background="#3B5998" 
+                        Background="#5D4777" 
                         Foreground="White" 
                         BorderThickness="0" 
                         FontFamily="Segoe UI"
@@ -88,7 +88,7 @@
                         Content="Видалити сторінку" 
                         Width="120" Height="30" 
                         Margin="5" 
-                        Background="#3B5998" 
+                        Background="#5D4777" 
                         Foreground="White" 
                         BorderThickness="0" 
                         FontFamily="Segoe UI"
@@ -102,7 +102,7 @@
         <TabControl x:Name="tabs" 
                     Grid.Row="1" Grid.Column="0" 
                     Background="White" 
-                    Margin="10" SelectionChanged="tabs_SelectionChanged"/>
+                    Margin="10"/>
 
         <components:SharedVariablesComponent
             x:Name="SharedVariablesComponent"

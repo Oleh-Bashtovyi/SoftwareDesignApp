@@ -1,0 +1,86 @@
+{
+  "blocks": [
+    {
+      "id": "Start",
+      "type": "StartBlockControl",
+      "x": 298.0,
+      "y": 38.0,
+      "nextBlock": "Block_1"
+    },
+    {
+      "id": "End",
+      "type": "EndBlockControl",
+      "x": 544.4000000000003,
+      "y": 440.7999999999996
+    },
+    {
+      "id": "Block_1",
+      "type": "PrintBlockControl",
+      "x": 297.3999999999999,
+      "y": 116.23999999999998,
+      "var": "V1",
+      "nextBlock": "Block_2"
+    },
+    {
+      "id": "Block_2",
+      "type": "ConditionBlockControl",
+      "x": 297.4000000000001,
+      "y": 186.64000000000001,
+      "var": "V1",
+      "value": 45,
+      "condition": "<=",
+      "trueNextBlock": "Block_4",
+      "falseNextBlock": "Block_3"
+    },
+    {
+      "id": "Block_3",
+      "type": "PrintBlockControl",
+      "x": 532.5999999999999,
+      "y": 266.6400000000001,
+      "var": "V1",
+      "nextBlock": "Block_7"
+    },
+    {
+      "id": "Block_4",
+      "type": "MathOperationBlockControl",
+      "x": 296.6,
+      "y": 268.23999999999995,
+      "var1": "V1",
+      "var2": "_4_",
+      "operation": "*",
+      "nextBlock": "Block_5"
+    },
+    {
+      "id": "Block_5",
+      "type": "AssignmentBlockControl",
+      "x": 262.20000000000005,
+      "y": 358.6399999999997,
+      "var1": "V2",
+      "var2": "V1",
+      "nextBlock": "Block_6"
+    },
+    {
+      "id": "Block_6",
+      "type": "PrintBlockControl",
+      "x": 31.80000000000004,
+      "y": 269.83999999999986,
+      "var": "V2",
+      "nextBlock": "Block_2"
+    },
+    {
+      "id": "Block_7",
+      "type": "DelayBlockControl",
+      "x": 536.5999999999999,
+      "y": 346.6399999999998,
+      "delay": 100,
+      "nextBlock": "End"
+    },
+    {
+      "id": "Block_8",
+      "type": "DelayBlockControl",
+      "x": 553.4,
+      "y": 127.43999999999997,
+      "delay": 222
+    }
+  ]
+}

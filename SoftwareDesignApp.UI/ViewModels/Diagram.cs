@@ -3,6 +3,8 @@ using SoftwareDesignApp.UI.Blocks;
 using SoftwareDesignApp.UI.Blocks.Base;
 using System.Windows.Controls;
 using SoftwareDesignApp.Core;
+using SoftwareDesignApp.UI.Enums;
+using SoftwareDesignApp.UI.Exceptions;
 
 namespace SoftwareDesignApp.UI.ViewModels;
 
@@ -26,6 +28,21 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
 
     public void AddBlock(BaseBlockControl block)
     {
+        if (block == null)
+            throw new ArgumentNullException(nameof(block));
+
+        if (block is StartBlockControl)
+        {
+            if (_blocks.OfType<StartBlockControl>().Any())
+                throw new DiagramException(Name, DiagramErrorCode.MoreThanOneStartBlock, "Only one start block is allowed.");
+        }
+
+        if (block is EndBlockControl)
+        {
+            if (_blocks.OfType<EndBlockControl>().Any())
+                throw new DiagramException(Name, DiagramErrorCode.MoreThanOneEndBlock, "Only one end block is allowed.");
+        }
+
         _blocks.Add(block);
     }
 
@@ -37,14 +54,29 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
     public IReadOnlyCollection<BaseBlockControl> GetBlocks() => _blocks;
 
 
-
     public DiagramThread ToDiagramThread()
     {
-        var diagramThread = new DiagramThread(Name);
-        diagramThread.Blocks = _blocks.Select(x => x.ToCoreBlock()).ToList();
-        diagramThread.StartBlock = _blocks.First(x => x is StartBlockControl).ToCoreBlock();
+        ThrowIfDiagramInvalid();
+        var endBlock = _blocks.OfType<EndBlockControl>().FirstOrDefault();
+        var diagramThread = new DiagramThread(Name, _blocks.Select(x => x.ToCoreBlock(endBlock)).ToList());
         return diagramThread;
     }
+
+    private void ThrowIfDiagramInvalid()
+    {
+        var startBlocksCount = _blocks.OfType<StartBlockControl>().Count();
+        if (startBlocksCount == 0)
+            throw new DiagramException(Name, DiagramErrorCode.NoStartBlock, "Diagram does not contain start block");
+        if (startBlocksCount > 1)
+            throw new DiagramException(Name, DiagramErrorCode.MoreThanOneStartBlock, "Diagram contains more than one start block");
+
+        var endBlocksCount = _blocks.OfType<EndBlockControl>().Count();
+        if (endBlocksCount == 0)
+            throw new DiagramException(Name, DiagramErrorCode.NoEndBlock, "Diagram does not contain end block");
+        if (endBlocksCount > 1)
+            throw new DiagramException(Name, DiagramErrorCode.MoreThanOneEndBlock, "Diagram contains more than one end block");
+    }
+
 
     public Dictionary<string, object> ToDict()
     {
@@ -52,9 +84,7 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
 
         var data = new Dictionary<string, object>
         {
-            ["name"] = Name,
             ["blocks"] = blocksList,
-            ["shared_variables"] = SharedVariables?.GetVariables() ?? new Dictionary<string, int>()
         };
 
         foreach (var block in _blocks)
@@ -91,6 +121,16 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
                 blockData["value"] = conditionBlock.Value;
                 blockData["condition"] = conditionBlock.Condition;
             }
+            else if (block is DelayBlockControl delayBlock)
+            {
+                blockData["delay"] = delayBlock.DelayMs;
+            }
+            else if (block is MathOperationBlockControl mathOperationBlock)
+            {
+                blockData["var1"] = mathOperationBlock.TargetVariable;
+                blockData["var2"] = mathOperationBlock.OperationVariable;
+                blockData["operation"] = mathOperationBlock.Operation;
+            }
 
             if (block is OneNextBlockControl oneNextBlockControl && oneNextBlockControl.NextBlock != null)
             {
@@ -108,160 +148,35 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
         return data;
     }
 
-    public static Diagram LoadFromDict(Dictionary<string, object> data, SharedVariables sharedVariables)
+    public static Diagram LoadFromDict(string diagramName, Dictionary<string, object> data, SharedVariables sharedVariables)
     {
         var blockMap = new Dictionary<string, BaseBlockControl>();
-        var name = data["name"].ToString();
+        var diagram = new Diagram(diagramName, sharedVariables);
 
-        var diagram = new Diagram(name, sharedVariables);
-
-        // Додаємо змінні у спільну пам'ять
-        if (data.ContainsKey("shared_variables"))
-        {
-            var sharedVarsObj = data["shared_variables"];
-
-            // Обробляємо різні можливі типи для shared_variables
-            if (sharedVarsObj is Dictionary<string, object> sharedVarsDict)
-            {
-                foreach (var kvp in sharedVarsDict)
-                {
-                    // Конвертуємо значення до int
-                    int value = Convert.ToInt32(kvp.Value);
-                    sharedVariables.AddVariable(kvp.Key, value);
-                }
-            }
-            else if (sharedVarsObj is Newtonsoft.Json.Linq.JObject jObject)
-            {
-                foreach (var prop in jObject.Properties())
-                {
-                    int value = prop.Value.ToObject<int>();
-                    sharedVariables.AddVariable(prop.Name, value);
-                }
-            }
-        }
-
-        // Створення блоків
         if (data.ContainsKey("blocks"))
         {
-            var blocksData = new List<Dictionary<string, object>>();
-
-            // Обробляємо різні можливі типи для blocks
-            if (data["blocks"] is List<object> blocksList)
-            {
-                foreach (var blockObj in blocksList)
-                {
-                    if (blockObj is Dictionary<string, object> blockDict)
-                    {
-                        blocksData.Add(blockDict);
-                    }
-                    else if (blockObj is Newtonsoft.Json.Linq.JObject jObj)
-                    {
-                        var blockDict2 = jObj.ToObject<Dictionary<string, object>>();
-                        blocksData.Add(blockDict2);
-                    }
-                }
-            }
-            else if (data["blocks"] is Newtonsoft.Json.Linq.JArray jArray)
-            {
-                foreach (var item in jArray)
-                {
-                    var blockDict = item.ToObject<Dictionary<string, object>>();
-                    blocksData.Add(blockDict);
-                }
-            }
+            var blocksData = ParseBlocksData(data["blocks"]);
 
             // Створюємо блоки
             foreach (var blockData in blocksData)
             {
+                string blockId = blockData["id"].ToString();
                 string blockType = blockData["type"].ToString();
-                BaseBlockControl block = null;
+                double x = Convert.ToDouble(blockData["x"]);
+                double y = Convert.ToDouble(blockData["y"]);
 
-                // Створюємо блок в залежності від його типу
-                switch (blockType)
-                {
-                    case nameof(StartBlockControl):
-                        block = new StartBlockControl(blockData["id"].ToString());
-                        break;
-                    case nameof(EndBlockControl):
-                        block = new EndBlockControl(blockData["id"].ToString());
-                        break;
-                    case nameof(PrintBlockControl):
-                        block = new PrintBlockControl(blockData["id"].ToString(), blockData["var"].ToString());
-                        break;
-                    case nameof(InputBlockControl):
-                        block = new InputBlockControl(blockData["id"].ToString(), blockData["var"].ToString());
-                        break;
-                    case nameof(AssignmentBlockControl):
-                        block = new AssignmentBlockControl(blockData["id"].ToString(),
-                                                          blockData["var1"].ToString(),
-                                                          blockData["var2"].ToString());
-                        break;
-                    case nameof(ConstantBlockControl):
-                        block = new ConstantBlockControl(blockData["id"].ToString(),
-                                                        blockData["var"].ToString(),
-                                                        Convert.ToInt32(blockData["value"]));
-                        break;
-                    case nameof(ConditionBlockControl):
-                        block = new ConditionBlockControl(blockData["id"].ToString(),
-                                                         blockData["var"].ToString(),
-                                                         Convert.ToInt32(blockData["value"]),
-                                                         blockData["condition"].ToString());
-                        break;
-                }
+                var block = CreateBlock(blockType, blockData);
 
                 if (block != null)
                 {
-                    var x = Convert.ToDouble(blockData["x"]);
-                    var y = Convert.ToDouble(blockData["y"]);
                     Canvas.SetLeft(block, x);
                     Canvas.SetTop(block, y);
-                    blockMap[block.BlockId] = block;
+                    blockMap[blockId] = block;
                 }
             }
 
             // Встановлюємо зв'язки між блоками
-            foreach (var blockData in blocksData)
-            {
-                var blockId = blockData["id"].ToString();
-
-                if (blockMap.TryGetValue(blockId, out var curBlock))
-                {
-                    if (curBlock is OneNextBlockControl oneNextBlockControl && blockData.ContainsKey("nextBlock"))
-                    {
-                        var nextId = blockData["nextBlock"].ToString();
-                        if (!string.IsNullOrEmpty(nextId) && blockMap.TryGetValue(nextId, out var nextBlock))
-                        {
-                            oneNextBlockControl.SetNextBlock(nextBlock);
-                        }
-                    }
-
-                    if (curBlock is ConditionBlockControl conditionBlockControl)
-                    {
-                        BaseBlockControl trueNextBlock = null;
-                        BaseBlockControl falseNextBlock = null;
-
-                        if (blockData.ContainsKey("trueNextBlock"))
-                        {
-                            var trueBlockId = blockData["trueNextBlock"].ToString();
-                            if (!string.IsNullOrEmpty(trueBlockId) && blockMap.TryGetValue(trueBlockId, out var trueBlock))
-                            {
-                                trueNextBlock = trueBlock;
-                            }
-                        }
-
-                        if (blockData.ContainsKey("falseNextBlock"))
-                        {
-                            var falseBlockId = blockData["falseNextBlock"].ToString();
-                            if (!string.IsNullOrEmpty(falseBlockId) && blockMap.TryGetValue(falseBlockId, out var falseBlock))
-                            {
-                                falseNextBlock = falseBlock;
-                            }
-                        }
-
-                        conditionBlockControl.SetNextBlocks(trueNextBlock, falseNextBlock);
-                    }
-                }
-            }
+            SetupBlockConnections(blocksData, blockMap);
         }
 
         foreach (var block in blockMap.Values)
@@ -272,6 +187,134 @@ public class Diagram(string name, SharedVariables sharedVariables) : BaseViewMod
         return diagram;
     }
 
+    private static List<Dictionary<string, object>> ParseBlocksData(object blocksObj)
+    {
+        var blocksData = new List<Dictionary<string, object>>();
 
+        if (blocksObj is List<object> blocksList)
+        {
+            foreach (var blockObj in blocksList)
+            {
+                AddBlockToDictionary(blockObj, blocksData);
+            }
+        }
+        else if (blocksObj is Newtonsoft.Json.Linq.JArray jArray)
+        {
+            foreach (var item in jArray)
+            {
+                var blockDict = item.ToObject<Dictionary<string, object>>();
+                if (blockDict != null)
+                    blocksData.Add(blockDict);
+            }
+        }
 
+        return blocksData;
+    }
+
+    private static void AddBlockToDictionary(object blockObj, List<Dictionary<string, object>> blocksData)
+    {
+        if (blockObj is Dictionary<string, object> blockDict)
+        {
+            blocksData.Add(blockDict);
+        }
+        else if (blockObj is Newtonsoft.Json.Linq.JObject jObj)
+        {
+            var blockDict2 = jObj.ToObject<Dictionary<string, object>>();
+            if (blockDict2 != null)
+                blocksData.Add(blockDict2);
+        }
+    }
+
+    private static BaseBlockControl CreateBlock(string blockType, Dictionary<string, object> blockData)
+    {
+        string id = blockData["id"].ToString();
+
+        switch (blockType)
+        {
+            case nameof(StartBlockControl):
+                return new StartBlockControl(id);
+
+            case nameof(EndBlockControl):
+                return new EndBlockControl(id);
+
+            case nameof(PrintBlockControl):
+                return new PrintBlockControl(id, blockData["var"].ToString());
+
+            case nameof(InputBlockControl):
+                return new InputBlockControl(id, blockData["var"].ToString());
+
+            case nameof(AssignmentBlockControl):
+                return new AssignmentBlockControl(id, blockData["var1"].ToString(), blockData["var2"].ToString());
+
+            case nameof(ConstantBlockControl):
+                return new ConstantBlockControl(id, blockData["var"].ToString(), Convert.ToInt32(blockData["value"]));
+
+            case nameof(ConditionBlockControl):
+                return new ConditionBlockControl(id, blockData["var"].ToString(),
+                    Convert.ToInt32(blockData["value"]), blockData["condition"].ToString());
+
+            case nameof(DelayBlockControl):
+                return new DelayBlockControl(id, Convert.ToInt32(blockData["delay"]));
+
+            case nameof(MathOperationBlockControl):
+                return new MathOperationBlockControl(id, blockData["var1"].ToString(),
+                    blockData["operation"].ToString(), blockData["var2"].ToString());
+
+            default:
+                return null;
+        }
+    }
+
+    private static void SetupBlockConnections(List<Dictionary<string, object>> blocksData, Dictionary<string, BaseBlockControl> blockMap)
+    {
+        foreach (var blockData in blocksData)
+        {
+            var blockId = blockData["id"].ToString();
+
+            if (!blockMap.TryGetValue(blockId, out var curBlock))
+                continue;
+
+            // Встановлюємо зв'язки для блоків з одним виходом
+            if (curBlock is OneNextBlockControl oneNextBlock && blockData.ContainsKey("nextBlock"))
+            {
+                var nextId = blockData["nextBlock"]?.ToString();
+                if (!string.IsNullOrEmpty(nextId) && blockMap.TryGetValue(nextId, out var nextBlock))
+                {
+                    oneNextBlock.SetNextBlock(nextBlock);
+                    nextBlock?.AddIncomingBlock(oneNextBlock);
+                }
+            }
+
+            // Встановлюємо зв'язки для умовних блоків
+            if (curBlock is ConditionBlockControl conditionBlock)
+            {
+                SetupConditionBlockConnections(blockData, blockMap, conditionBlock);
+            }
+        }
+    }
+
+    private static void SetupConditionBlockConnections(Dictionary<string, object> blockData,
+        Dictionary<string, BaseBlockControl> blockMap, ConditionBlockControl conditionBlock)
+    {
+        BaseBlockControl trueNextBlock = null;
+        BaseBlockControl falseNextBlock = null;
+
+        if (blockData.ContainsKey("trueNextBlock"))
+        {
+            var trueBlockId = blockData["trueNextBlock"]?.ToString();
+            if (!string.IsNullOrEmpty(trueBlockId))
+                blockMap.TryGetValue(trueBlockId, out trueNextBlock);
+        }
+
+        if (blockData.ContainsKey("falseNextBlock"))
+        {
+            var falseBlockId = blockData["falseNextBlock"]?.ToString();
+            if (!string.IsNullOrEmpty(falseBlockId))
+                blockMap.TryGetValue(falseBlockId, out falseNextBlock);
+        }
+
+        conditionBlock.SetNextBlocks(trueNextBlock, falseNextBlock);
+        trueNextBlock?.AddIncomingBlock(conditionBlock);
+        falseNextBlock?.AddIncomingBlock(conditionBlock);
+    }
 }
