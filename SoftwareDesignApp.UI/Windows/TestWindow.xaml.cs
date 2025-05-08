@@ -123,6 +123,14 @@ namespace SoftwareDesignApp.UI.Windows
                     counter++;
                 }
 
+                counter = 1;
+                foreach (var output in result.UniqueOutputs)
+                {
+                    var uniqueOutputMessage = $"UNIQUE OUTPUT {counter}\n" +
+                                               $"{output}";
+                    AddLog(uniqueOutputMessage);
+                    counter++;
+                }
             }
             catch (Exception ex)
             {

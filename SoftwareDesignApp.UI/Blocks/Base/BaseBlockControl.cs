@@ -59,17 +59,6 @@ public class BaseBlockControl : UserControl, INotifyPropertyChanged
     {
     }
 
-    public virtual Dictionary<string, object?> GetSaveData()
-    {
-        var dict = new Dictionary<string, object?>
-        {
-            ["BlockId"] = BlockId,
-            ["x"] = Canvas.GetLeft(this),
-            ["y"] = Canvas.GetTop(this)
-        };
-        return dict;
-    }
-
     public virtual Block ToCoreBlock(EndBlockControl endBlock)
     {
         throw new NotImplementedException("Can not create core block from base block control");
